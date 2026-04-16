@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etapa 3 — Seguimiento Etapa Productiva</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Montserrat',system-ui,sans-serif;font-size:14px;color:#1a1a1a;background:#f9f8ff;padding:1rem;-webkit-font-smoothing:antialiased}
+.wrap{max-width:680px;margin:0 auto}
+.header{background:#534AB7;border-radius:12px;padding:16px;margin-bottom:1rem;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,0.05)}
+.header-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.header-badge{background:rgba(255,255,255,0.18);color:#EEEDFE;font-size:10px;font-weight:600;padding:3px 10px;border-radius:99px;letter-spacing:.5px}
+.header h2{color:#EEEDFE;font-size:18px;font-weight:700;margin-bottom:4px}
+.header p{color:#AFA9EC;font-size:12px;line-height:1.6}
+.datos-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.datos-grid label,.field-label{font-size:12px;color:#666;display:block;margin-bottom:4px;font-weight:500}
+.datos-grid input{width:100%;padding:8px 10px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;background:#fff;color:#1a1a1a;font-family:'Montserrat',sans-serif;transition:border .2s}
+.datos-grid input:focus{outline:none;border-color:#534AB7;box-shadow:0 0 0 3px rgba(83,74,183,.1)}
+.field-wrap{margin-bottom:10px}
+select{width:100%;padding:8px 10px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;background:#fff;font-family:'Montserrat',sans-serif;color:#1a1a1a;transition:border .2s}
+select:focus{outline:none;border-color:#534AB7;box-shadow:0 0 0 3px rgba(83,74,183,.1)}
+.inst{font-size:12px;color:#555;padding:10px 14px;border-left:3px solid #534AB7;background:#f5f4fe;margin-bottom:1rem;line-height:1.7;border-radius:0 8px 8px 0}
+.inst strong{color:#26215C}
+.seccion{border:1px solid #e0e0e0;border-radius:12px;overflow:hidden;margin-bottom:1rem;background:#fff}
+.sec-hdr{background:#F5F4FE;padding:10px 14px}
+.sec-hdr .badge{background:#EEEDFE;color:#3C3489;font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px;display:inline-block;margin-bottom:4px}
+.sec-hdr .sec-title{color:#26215C;font-size:13px;font-weight:600}
+.leyenda{display:flex;gap:12px;padding:6px 14px;border-top:1px solid #f0effe;background:#faf9ff;font-size:11px;color:#888}
+.pq{padding:12px 14px;border-top:1px solid #f0effe;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}
+.p-num{display:inline-block;background:#EEEDFE;color:#3C3489;font-size:9px;font-weight:700;padding:1px 7px;border-radius:99px;margin-bottom:5px}
+.p-text{font-size:12px;line-height:1.5;color:#1a1a1a}
+.escala-box{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0}
+.escala-labels{display:flex;gap:5px;font-size:9px;color:#bbb;font-weight:600}
+.escala-labels span{width:30px;text-align:center}
+.escala{display:flex;gap:5px}
+.escala label{cursor:pointer}
+.escala label input[type=radio]{display:none}
+.escala label .dot{width:30px;height:30px;border-radius:50%;border:2px solid #d0cef5;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#bbb;transition:all .15s ease}
+.escala label input[type=radio]:checked + .dot{background:#534AB7;border-color:#534AB7;color:#fff;transform:scale(1.1)}
+.escala label:hover .dot{border-color:#534AB7;color:#534AB7}
+.btn-calc{width:100%;padding:13px;background:#534AB7;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-top:1rem;font-family:'Montserrat',sans-serif;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-calc:hover{background:#3C3489;transform:translateY(-1px);box-shadow:0 4px 16px rgba(83,74,183,.25)}
+
+/* RESULTADOS */
+.resultados{border:1px solid #e0e0e0;border-radius:14px;margin-top:1.2rem;display:none;overflow:hidden;background:#fff}
+.warning-min{background:#FCEBEB;border-left:4px solid #A32D2D;padding:12px 14px;font-size:12px;color:#501313;display:none}
+.perfil-hero{background:linear-gradient(135deg,#534AB7 0%,#3C3489 100%);padding:24px 20px;text-align:center;position:relative;overflow:hidden}
+.perfil-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.06)}
+.pct-label{color:rgba(255,255,255,0.65);font-size:11px;margin-bottom:4px;letter-spacing:.5px}
+.pct-main{font-size:52px;font-weight:900;color:#fff;line-height:1;margin-bottom:4px}
+.pct-sub{font-size:12px;color:rgba(255,255,255,0.55);margin-bottom:10px}
+.perfil-badge{display:inline-block;padding:5px 18px;border-radius:99px;font-size:13px;font-weight:700;margin:6px 0}
+.perfil-desc{font-size:12px;color:rgba(255,255,255,0.72);line-height:1.6;max-width:440px;margin:0 auto}
+.stats-block{padding:14px 16px;border-bottom:1px solid #f0effe}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat-card{background:#f8f7ff;border-radius:10px;padding:12px 8px;text-align:center;border:1px solid #ede9fb}
+.stat-val{font-size:22px;font-weight:800;line-height:1}
+.stat-lbl{font-size:10px;color:#888;margin-top:3px}
+.viz-section{padding:16px;border-bottom:1px solid #f0effe}
+.viz-title{font-weight:700;font-size:13px;color:#26215C;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.radar-tabs{display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap}
+.radar-tab{padding:5px 13px;border-radius:99px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid #e0dcf5;background:#fff;color:#888;font-family:'Montserrat',sans-serif;transition:all .15s}
+.radar-tab.active{background:#534AB7;color:#fff;border-color:#534AB7}
+.radar-tab:hover:not(.active){border-color:#534AB7;color:#534AB7}
+.radar-panel{display:none}
+.radar-panel.active{display:block}
+.radar-canvas-wrap{position:relative;height:280px;margin-bottom:10px}
+.radar-legend{display:flex;flex-direction:column;gap:5px;margin-top:4px}
+.legend-row{display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:7px;background:#f9f8ff}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.legend-label{font-size:11px;color:#444;flex:1;font-weight:500}
+.legend-bar-bg{width:80px;height:5px;background:#ede9fb;border-radius:99px;overflow:hidden;flex-shrink:0}
+.legend-bar-fill{height:100%;border-radius:99px;transition:width .6s ease}
+.legend-pct{font-size:11px;font-weight:700;min-width:32px;text-align:right;font-family:'Montserrat',sans-serif}
+.progress-section{padding:16px;border-bottom:1px solid #f0effe}
+.progress-block{margin-bottom:16px}
+.progress-block-title{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;padding-bottom:4px;border-bottom:1.5px solid}
+.prog-row{margin-bottom:6px}
+.prog-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.prog-name{font-size:11px;color:#444;font-weight:500}
+.prog-val{font-size:11px;font-weight:700;font-family:'Montserrat',sans-serif;flex-shrink:0;margin-left:6px}
+.prog-bar-bg{height:7px;background:#f0effe;border-radius:99px;overflow:hidden}
+.prog-bar-fill{height:100%;border-radius:99px;transition:width .7s ease}
+.prog-item-list{margin-top:5px}
+.prog-item-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0 3px 12px;border-left:2px solid #e8e6f5;margin-bottom:2px}
+.prog-item-name{font-size:10px;color:#666;line-height:1.3}
+.prog-item-chip{font-size:9px;font-weight:700;padding:1px 7px;border-radius:99px;flex-shrink:0;margin-left:6px;font-family:'Montserrat',sans-serif}
+.plan-section{padding:16px;border-bottom:1px solid #f0effe;display:none}
+.plan-title{font-weight:700;font-size:13px;color:#26215C;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.plan-card{background:#f8f7ff;border-radius:10px;padding:12px 14px;margin-bottom:8px;border-left:3px solid #534AB7}
+.plan-card-title{font-size:12px;font-weight:700;color:#26215C;margin-bottom:6px}
+.plan-card-body{font-size:11px;color:#555;line-height:1.7}
+.actions-block{padding:14px 16px}
+.action-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.btn-pdf{padding:11px;background:#534AB7;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-pdf:hover{background:#3C3489}
+.btn-save{padding:11px;background:#0F6E56;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-save:hover{background:#085041}
+.sheets-status{font-size:11px;text-align:center;min-height:16px;color:#666}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="header">
+  <div class="header-top">
+    <span class="header-badge">ETAPA 3</span>
+    <span class="header-badge" style="background:rgba(255,255,255,0.1)">Semillero de Talentos</span>
+  </div>
+  <h2>Seguimiento Etapa Productiva</h2>
+  <p>Spectrum Brands · EFICACIA S.A.S. · 6 dimensiones · 18 ítems de desempeño · Escala 1–3</p>
+</div>
+
+<div class="datos-grid">
+  <div><label>Nombre completo *</label><input type="text" id="nombre" placeholder="En mayúsculas"></div>
+  <div><label>Cédula *</label><input type="text" id="cedula" placeholder="Sin puntos" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></div>
+</div>
+<div class="field-wrap">
+  <label class="field-label">Cliente *</label>
+  <select id="cliente">
+    <option value="">— Selecciona el cliente —</option>
+    <option>MANUELITA S A</option><option>ACERIAS DE COLOMBIA ACESCO S A S</option>
+    <option>COLGATE PALMOLIVE COMPAÑIA</option><option>COLOMBIANA KIMBERLY COLPAPEL S A</option>
+    <option>HUAWEI TECHNOLOGIES COLOMBIA SAS</option><option>PAYJOY COLOMBIA SAS</option>
+    <option>SPECTRUM BRANDS CORP SAS</option><option>SIKA COLOMBIA SAS</option>
+    <option>MIDEA COLOMBIA EQUIPMENTS SAS</option><option>COMERCIAL NUTRESA S A S</option>
+    <option>COMPAÑIA COLOMBIANA DE TABACO S A</option><option>BRITISH AMERICAN TOBACCO</option>
+    <option>MONDELEZ COLOMBIA S A S</option><option>ALMACENES EXITO S A</option>
+    <option>BLACK & DECKER DE COLOMBIA S A S</option><option>CRISTAR TABLETOP SAS</option>
+    <option>KENVUE COLOMBIA SA</option><option>POSTOBON S.A.</option>
+    <option>UNE EPM TELECOMUNICACIONES S A</option><option>UPFIELD COLOMBIA SAS</option>
+    <option>NUTRIMENTI</option><option>S C JOHNSON & SON COLOMBIANA S A</option>
+    <option>SOFYS COLOMBIA SA</option><option>ALIMENTOS CARNICOS SAS</option>
+    <option>COMPAÑIA GLOBAL DE PINTURAS S A</option><option>GENOMMA LAB COLOMBIA LTDA</option>
+    <option>HENKEL COLOMBIANA S A</option><option>HONOR</option>
+  </select>
+</div>
+<div class="datos-grid">
+  <div><label>Cupo *</label>
+    <select id="cupo"><option value="">— Cupo —</option><option>FIJO</option><option>ADICIONAL</option><option>PROYECTO</option><option>EMBARAZADA</option></select>
+  </div>
+  <div><label>Zona *</label>
+    <select id="zona"><option value="">— Zona —</option><option>CENTRO</option><option>NORTE</option><option>ANTIOQUIA</option><option>OCCIDENTE</option></select>
+  </div>
+</div>
+<div class="inst">
+  Evalúa cada ítem según el desempeño <strong>real y observable</strong> del colaborador durante la etapa productiva.<br>
+  <strong>1 = Nivel Bajo &nbsp;·&nbsp; 2 = Nivel Medio &nbsp;·&nbsp; 3 = Nivel Alto</strong>
+</div>
+
+<!-- D1 -->
+<div class="seccion">
+  <div class="sec-hdr"><div class="badge">Dimensión 1</div><div class="sec-title">Autonomía y Autogestión</div></div>
+  <div class="leyenda"><span>1 Nivel Bajo</span><span>·</span><span>2 Nivel Medio</span><span>·</span><span>3 Nivel Alto</span></div>
+  <div class="pq"><div><div class="p-num">1.1</div><div class="p-text">Ejecuta sus actividades sin requerir supervisión constante.</div></div><div class="escala-box"><div class="escala-labels"><span>1</span><span>2</span><span>3</span></div><div class="escala"><label><input type="radio" name="d1-1" value="1"><div class="dot">1</div></label><label><input type="radio" name="d1-1" value="2"><div class="dot">2</div></label><label><input type="radio" name="d1-1" value="3"><div class="dot">3</div></label></div></div></div>
+  <div class="pq"><div><div class="p-num">1.2</div><div class="p-text">Organiza su tiempo y prioriza tareas de forma adecuada.</div></div><div class="escala-box"><div class="escala-labels"><span>1</span><span>2</span><span>3</span></div><div class="escala"><label><input type="radio" name="d1-2" value="1"><div class="dot">1</div></label><label><input type="radio" name="d1-2" value="2"><div class="dot">2</div></label><label><input type="radio" name="d1-2" value="3"><div class="dot">3</div></label></div></div></div>
+  <div class="pq"><div><div class="p-num">1.3</div><div class="p-text">Cumple compromisos y responsabilidades asignadas.</div></div><div class="escala-box"><div class="escala-labels"><span>1</span><span>2</span><span>3</span></div><div class="escala"><label><input type="radio" name="d1-3" value="1"><div class="dot">1</div></label><label><input type="radio" name="d1-3" value="2"><div class="dot">2</div></label><label><input type="radio" name="d1-3" value="3"><div class="dot">3</div></label></div></div></div>
+  <div class="pq"><div><div class="p-num">1.4</div><div class="p-text">Responde de manera oportuna ante situaciones imprevistas.</div></div><div class="escala-box"><div class="escala-labels"><span>1</span><span>2</span><span>3</span></div><div class="escala"><label><input type="radio" name="d1-4" value="1"><div class="dot">1</div></label><label><input type="radio" name="d1-4" value="2"><div class="dot">2</div></label><label><input type="radio" name="d1-4" value="3"><div class="dot">3</div></label></div></div></div>
+</div>
+<!-- D2 -->
+<div class="seccion">
+  <div class="sec-hdr"><div class="badge">Dimensión 2</div><div class="sec-title">Criterio y Toma de Decisiones</div></div>
+  <div class="leyenda"><span>1 Nivel Bajo</span><span>·</span><span>2 Nivel Medio</span><span>·</span><span>3 Nivel Alto</span></div>
+  <div class="pq"><div><div class="p-num">2.1</div><div class="p-text">Toma decisiones alineadas con los lineamientos de la marca.</div></div><div class="escala-box"><div class="escala-labels"><span>1</span><span>2</span><span>3</span></div><div class="escala"><label><input type="radio" name="d2-1" value="1"><div class="dot">1</div></label><label><input type="radio" name="d2-1" value="2"><div class="dot">2</div></label><label><input type="radio" name="d2-1" value="3"><div class="dot">3</div></label></div></div></div>
+  <div class="pq"><div><div class="p-num">2.2</div><div class="p-text">Identifica cuándo debe actuar de forma autónoma y cuándo escalar.</div></div><div class="escala-box"><div class="escala-labels"><span>1</span><span>2</span><span>3</span></div><div class="escala"><label><input type="radio" name="d2-2" value="1"><div class="dot">1</div></label><label><input type="radio" name="d2-2" value="2"><div class="dot">2</div></label><label><input type="radio" name="d2-2" value="3"><div class="dot">3</div></label></div></div></div>
+  <div class="pq"><div><div class="p-num">2.3</div><div class="p-text">Resuelve situaciones básicas sin afectar la operación.</div></div><div class="escala-box"><div class="escala-labels"><span>1</span><span>2</span><span>3</span></div><div class="escala"><label><input type="radio" name="d2-3" value="1"><div class="dot">1</div></label><label><input type="radio" name="d2-3" value="2"><div class="dot">2</div></label><label><input type="radio" name="d2-3" value="3"><div class="dot">3</div></label></div></div></div>
+</div>
+<!-- D3 -->
+<div class="seccion">
+  <div class="sec-hdr"><div class="badge">Dimensión 3</div><div class="sec-title">Confiabilidad y Responsabilidad</div></div>
+  <div class="leyenda"><span>1 Nivel Bajo</span><span>·</span><span>2 Nivel Medio</span><span>·</span><span>3 Nivel Alto</span></div>
+  <div class="pq"><div><div class="p-num">3.1</div><div class="p-text">Cumple horarios, rutas y tiempos establecidos de forma constante.</div></div><div class="escala-box"><div class="escala-labels"><span>1</span><span>2</span><span>3</span></div><div class="escala"><label><input type="radio" name="d3-1" value="1"><div class="dot">1</div></label><label><input type="radio" name="d3-1" value="2"><div class="dot">2</div></label><label><input type="radio" name="d3-1" value="3"><div class="dot">3</div></label></div></div></div>
+  <div class="pq"><div><div class="p-num">3.2</div><div class="p-text">Asume responsabilidad frente a errores o incumplimientos.</div></div><div class="escala-box"><div class="escala-labels"><span>1</span><span>2</span><span>3</span></div><div class="escala"><label><input type="radio" name="d3-2" value="1"><div class="dot">1</div></label><label><input type="radio" name="d3-2" value="2"><div class="dot">2</div></label><label><input type="radio" name="d3-2" value="3"><div class="dot">3</div></label></div></div></div>
+  <div class="pq"><div><div class="p-num">3.3</div><div class="p-text">Maneja adecuadamente la información y recursos asignados.</div></div><div class="escala-box"><div class="escala-labels"><span>1</span><span>2</span><span>3</span></div><div class="escala"><label><input type="radio" name="d3-3" value="1"><div class="dot">1</div></label><label><input type="radio" name="d3-3" value="2"><div class="dot">2</div></label><label><input type="radio" name="d3-3" value="3"><div class="dot">3</div></label></div></div></div>
+</div>
+<!-- D4 -->
+<div class="seccion">
+  <div class="sec-hdr"><div class="badge">Dimensión 4</div><div class="sec-title">Adaptación y Aprendizaje</div></div>
+  <div class="leyenda"><span>1 Nivel Bajo</span><span>·</span><span>2 Nivel Medio</span><span>·</span><span>3 Nivel Alto</span></div>
+  <div class="pq"><div><div class="p-num">4.1</div><div class="p-text">Aplica la retroalimentación recibida durante la etapa productiva.</div></div><div class="escala-box"><div class="escala-labels"><span>1</span><span>2</span><span>3</span></div><div class="escala"><label><input type="radio" name="d4-1" value="1"><div class="dot">1</div></label><label><input type="radio" name="d4-1" value="2"><div class="dot">2</div></label><label><input type="radio" name="d4-1" value="3"><div class="dot">3</div></label></div></div></div>
+  <div class="pq"><div><div class="p-num">4.2</div><div class="p-text">Muestra avances evidentes desde el inicio del período de prueba.</div></div><div class="escala-box"><div class="escala-labels"><span>1</span><span>2</span><span>3</span></div><div class="escala"><label><input type="radio" name="d4-2" value="1"><div class="dot">1</div></label><label><input type="radio" name="d4-2" value="2"><div class="dot">2</div></label><label><input type="radio" name="d4-2" value="3"><div class="dot">3</div></label></div></div></div>
+  <div class="pq"><div><div class="p-num">4.3</div><div class="p-text">Se adapta a cambios de dinámica, punto de venta o producto.</div></div><div class="escala-box"><div class="escala-labels"><span>1</span><span>2</span><span>3</span></div><div class="escala"><label><input type="radio" name="d4-3" value="1"><div class="dot">1</div></label><label><input type="radio" name="d4-3" value="2"><div class="dot">2</div></label><label><input type="radio" name="d4-3" value="3"><div class="dot">3</div></label></div></div></div>
+</div>
+<!-- D5 -->
+<div class="seccion">
+  <div class="sec-hdr"><div class="badge">Dimensión 5</div><div class="sec-title">Actitud y Madurez Laboral</div></div>
+  <div class="leyenda"><span>1 Nivel Bajo</span><span>·</span><span>2 Nivel Medio</span><span>·</span><span>3 Nivel Alto</span></div>
+  <div class="pq"><div><div class="p-num">5.1</div><div class="p-text">Mantiene una actitud profesional frente a su rol.</div></div><div class="escala-box"><div class="escala-labels"><span>1</span><span>2</span><span>3</span></div><div class="escala"><label><input type="radio" name="d5-1" value="1"><div class="dot">1</div></label><label><input type="radio" name="d5-1" value="2"><div class="dot">2</div></label><label><input type="radio" name="d5-1" value="3"><div class="dot">3</div></label></div></div></div>
+  <div class="pq"><div><div class="p-num">5.2</div><div class="p-text">Se comunica de manera respetuosa y asertiva.</div></div><div class="escala-box"><div class="escala-labels"><span>1</span><span>2</span><span>3</span></div><div class="escala"><label><input type="radio" name="d5-2" value="1"><div class="dot">1</div></label><label><input type="radio" name="d5-2" value="2"><div class="dot">2</div></label><label><input type="radio" name="d5-2" value="3"><div class="dot">3</div></label></div></div></div>
+  <div class="pq"><div><div class="p-num">5.3</div><div class="p-text">Demuestra compromiso con su proceso formativo.</div></div><div class="escala-box"><div class="escala-labels"><span>1</span><span>2</span><span>3</span></div><div class="escala"><label><input type="radio" name="d5-3" value="1"><div class="dot">1</div></label><label><input type="radio" name="d5-3" value="2"><div class="dot">2</div></label><label><input type="radio" name="d5-3" value="3"><div class="dot">3</div></label></div></div></div>
+</div>
+<!-- D6 -->
+<div class="seccion">
+  <div class="sec-hdr"><div class="badge">Dimensión 6</div><div class="sec-title">Proyección en el Rol</div></div>
+  <div class="leyenda"><span>1 Nivel Bajo</span><span>·</span><span>2 Nivel Medio</span><span>·</span><span>3 Nivel Alto</span></div>
+  <div class="pq"><div><div class="p-num">6.1</div><div class="p-text">Se percibe como un aprendiz confiable para continuar el proceso.</div></div><div class="escala-box"><div class="escala-labels"><span>1</span><span>2</span><span>3</span></div><div class="escala"><label><input type="radio" name="d6-1" value="1"><div class="dot">1</div></label><label><input type="radio" name="d6-1" value="2"><div class="dot">2</div></label><label><input type="radio" name="d6-1" value="3"><div class="dot">3</div></label></div></div></div>
+  <div class="pq"><div><div class="p-num">6.2</div><div class="p-text">Tiene potencial para asumir mayores responsabilidades.</div></div><div class="escala-box"><div class="escala-labels"><span>1</span><span>2</span><span>3</span></div><div class="escala"><label><input type="radio" name="d6-2" value="1"><div class="dot">1</div></label><label><input type="radio" name="d6-2" value="2"><div class="dot">2</div></label><label><input type="radio" name="d6-2" value="3"><div class="dot">3</div></label></div></div></div>
+  <div class="pq"><div><div class="p-num">6.3</div><div class="p-text">Aporta valor al equipo y a la operación.</div></div><div class="escala-box"><div class="escala-labels"><span>1</span><span>2</span><span>3</span></div><div class="escala"><label><input type="radio" name="d6-3" value="1"><div class="dot">1</div></label><label><input type="radio" name="d6-3" value="2"><div class="dot">2</div></label><label><input type="radio" name="d6-3" value="3"><div class="dot">3</div></label></div></div></div>
+</div>
+
+<button class="btn-calc" onclick="calcular()">Ver perfil de desempeño →</button>
+
+<!-- ═══════ RESULTADOS ═══════ -->
+<div class="resultados" id="resultados">
+  <div class="warning-min" id="warning-min">⚠ Debes calificar todos los ítems para obtener un resultado válido.</div>
+  <div id="resultado-valido">
+    <div class="perfil-hero">
+      <div class="pct-label">PUNTAJE TOTAL OBTENIDO</div>
+      <div class="pct-main" id="pct-main">—</div>
+      <div class="pct-sub" id="pct-sub">sobre 54 puntos posibles</div>
+      <div id="perfil-badge-wrap"></div>
+      <div class="perfil-desc" id="perfil-desc"></div>
+    </div>
+    <div class="stats-block">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-val" id="stat-pts" style="color:#534AB7">—</div><div class="stat-lbl">Puntos obtenidos</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-pct" style="color:#0F6E56">—</div><div class="stat-lbl">Porcentaje total</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-nivel" style="color:#C49A1A">—</div><div class="stat-lbl">Nivel alcanzado</div></div>
+      </div>
+    </div>
+    <div class="viz-section">
+      <div class="viz-title">📊 Mapa de desempeño por dimensión</div>
+      <div class="radar-tabs">
+        <button class="radar-tab active" onclick="switchTab(event,'radar')">🕸 Radar</button>
+        <button class="radar-tab" onclick="switchTab(event,'barras')">📊 Barras</button>
+        <button class="radar-tab" onclick="switchTab(event,'detalle')">📋 Ítems</button>
+      </div>
+      <div class="radar-panel active" id="panel-radar">
+        <div class="radar-canvas-wrap"><canvas id="chart-radar"></canvas></div>
+        <div class="radar-legend" id="radar-legend"></div>
+      </div>
+      <div class="radar-panel" id="panel-barras">
+        <div style="position:relative;height:260px"><canvas id="chart-barras"></canvas></div>
+      </div>
+      <div class="radar-panel" id="panel-detalle">
+        <div style="position:relative;height:320px"><canvas id="chart-detalle"></canvas></div>
+        <div style="display:flex;gap:14px;margin-top:8px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:#555"><span style="width:12px;height:12px;border-radius:2px;background:#0F6E56;display:inline-block"></span>Nivel Alto (3)</div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:#555"><span style="width:12px;height:12px;border-radius:2px;background:#534AB7;display:inline-block"></span>Nivel Medio (2)</div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:#555"><span style="width:12px;height:12px;border-radius:2px;background:#A32D2D;display:inline-block"></span>Nivel Bajo (1)</div>
+        </div>
+      </div>
+    </div>
+    <div class="progress-section" id="progress-section"></div>
+    <div class="plan-section" id="plan-section">
+      <div class="plan-title">🎯 Dimensiones prioritarias de fortalecimiento</div>
+      <div id="plan-items"></div>
+    </div>
+    <div class="actions-block">
+      <div class="action-btns">
+        <button class="btn-pdf" onclick="descargarPDF()">⬇ Descargar PDF</button>
+        <button class="btn-save" onclick="enviarSheets()">☁ Guardar datos</button>
+      </div>
+      <div class="sheets-status" id="sheets-status"></div>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>
+const dimensiones=[
+  {id:'d1',label:'Autonomía y Autogestión',color:'#534AB7',items:4,names:['d1-1','d1-2','d1-3','d1-4'],descs:['Ejecuta sin supervisión constante','Organiza tiempo y prioriza tareas','Cumple compromisos asignados','Responde ante situaciones imprevistas'],acciones:['Establecer plan diario autónomo sin esperar instrucciones del coordinador.','Usar checklist propio de responsabilidades que gestione de forma independiente.']},
+  {id:'d2',label:'Criterio y Toma de Decisiones',color:'#7C5CBF',items:3,names:['d2-1','d2-2','d2-3'],descs:['Decisiones alineadas con la marca','Sabe cuándo actuar o escalar','Resuelve sin afectar la operación'],acciones:['Practicar casos simulados del punto de venta con apoyo del coordinador.','Revisar lineamientos de la marca para reforzar criterio en situaciones límite.']},
+  {id:'d3',label:'Confiabilidad y Responsabilidad',color:'#0E7490',items:3,names:['d3-1','d3-2','d3-3'],descs:['Cumple horarios y rutas constantemente','Asume responsabilidad ante errores','Maneja bien información y recursos'],acciones:['Registrar puntualmente asistencia y cumplimiento de rutas en bitácora.','Practicar protocolo ante errores: reconocer, reportar, corregir y documentar.']},
+  {id:'d4',label:'Adaptación y Aprendizaje',color:'#0F6E56',items:3,names:['d4-1','d4-2','d4-3'],descs:['Aplica retroalimentación recibida','Muestra avances desde el inicio','Se adapta a cambios de dinámica'],acciones:['Llevar registro semanal de retroalimentaciones y acciones de mejora tomadas.','Al recibir cambio de asignación, documentar el aprendizaje requerido y buscarlo.']},
+  {id:'d5',label:'Actitud y Madurez Laboral',color:'#854F0B',items:3,names:['d5-1','d5-2','d5-3'],descs:['Actitud profesional frente al rol','Comunicación respetuosa y asertiva','Compromiso con el proceso formativo'],acciones:['Practicar comunicación asertiva con el equipo en situaciones de presión.','Participar activamente en todas las instancias formativas sin necesidad de recordatorios.']},
+  {id:'d6',label:'Proyección en el Rol',color:'#A32D2D',items:3,names:['d6-1','d6-2','d6-3'],descs:['Aprendiz confiable para continuar','Potencial para mayores responsabilidades','Aporta valor al equipo y la operación'],acciones:['Identificar junto con el coordinador un área de aporte específica que lidere.','Establecer metas de crecimiento a 30, 60 y 90 días con compromisos medibles.']}
+];
+const perfiles=[
+  {min:0,max:28,label:'Nivel Bajo',c:'#A32D2D',bg:'#FCEBEB',desc:'El colaborador requiere acompañamiento intensivo. Se recomienda un plan de refuerzo en las dimensiones críticas antes de continuar el proceso productivo.'},
+  {min:29,max:42,label:'Nivel Medio',c:'#854F0B',bg:'#FAEEDA',desc:'Se evidencian avances parciales. Continuar con seguimiento focalizado en las dimensiones con menor puntaje y revisiones quincenales.'},
+  {min:43,max:54,label:'Nivel Alto',c:'#0F6E56',bg:'#E1F5EE',desc:'Excelente desempeño en la etapa productiva. El colaborador está listo para consolidar su proceso y asumir responsabilidades con mayor autonomía.'}
+];
+let globalData={}, chartInstances={};
+
+function getVal(name){const r=document.querySelector(`input[name="${name}"]:checked`);return r?parseInt(r.value):null;}
+function colorByPct(p){return p>=85?'#0F6E56':p>=67?'#534AB7':p>=45?'#854F0B':'#A32D2D';}
+function switchTab(e,tab){
+  document.querySelectorAll('.radar-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.radar-panel').forEach(p=>p.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
+}
+function hexToRgb(hex){return[parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)];}
+
+function calcular(){
+  const nombre=document.getElementById('nombre').value.trim();
+  const cedula=document.getElementById('cedula').value.trim();
+  const cliente=document.getElementById('cliente').value;
+  const cupo=document.getElementById('cupo').value;
+  const zona=document.getElementById('zona').value;
+  let missing=false;
+  const dimScores=dimensiones.map(dim=>{
+    let pts=0,count=0;
+    dim.names.forEach(name=>{const v=getVal(name);if(v===null){missing=true;}else{pts+=v;count++;}});
+    return{...dim,pts,count,pct:Math.round((pts/(dim.items*3))*100)};
+  });
+  const totalPts=dimScores.reduce((a,d)=>a+d.pts,0);
+  const pct=Math.round((totalPts/54)*100);
+  document.getElementById('resultados').style.display='block';
+  if(missing){
+    document.getElementById('warning-min').style.display='block';
+    document.getElementById('resultado-valido').style.display='none';
+    document.getElementById('resultados').scrollIntoView({behavior:'smooth'});
+    return;
+  }
+  document.getElementById('warning-min').style.display='none';
+  document.getElementById('resultado-valido').style.display='block';
+  document.getElementById('pct-main').textContent=totalPts+'/54';
+  document.getElementById('pct-sub').textContent=pct+'% del total — 18 ítems evaluados';
+  document.getElementById('stat-pts').textContent=totalPts;
+  document.getElementById('stat-pct').textContent=pct+'%';
+  const p=perfiles.find(x=>totalPts>=x.min&&totalPts<=x.max)||perfiles[0];
+  document.getElementById('stat-nivel').textContent=p.label;
+  document.getElementById('perfil-badge-wrap').innerHTML=`<span class="perfil-badge" style="background:${p.bg};color:${p.c}">${p.label}</span>`;
+  document.getElementById('perfil-desc').textContent=p.desc;
+  buildCharts(dimScores);
+  buildProgressBars(dimScores);
+  buildPlan(dimScores);
+  globalData={nombre,cedula,cliente,cupo,zona,totalPts,pct,perfil:p.label,timestamp:new Date().toISOString(),dimPts:dimScores.map(d=>d.pts)};
+  document.getElementById('resultados').scrollIntoView({behavior:'smooth'});
+  setTimeout(()=>enviarSheets(),800);
+}
+
+function buildCharts(dimScores){
+  Object.values(chartInstances).forEach(c=>c&&c.destroy&&c.destroy());
+  chartInstances={};
+  const pcts=dimScores.map(d=>d.pct);
+  const colors=dimScores.map(d=>d.color);
+  const shortL=dimScores.map(d=>{const w=d.label.split(' ');return w.length>2?w.slice(0,2).join(' ')+'…':d.label;});
+
+  // Radar
+  chartInstances.radar=new Chart(document.getElementById('chart-radar'),{
+    type:'radar',
+    data:{labels:shortL,datasets:[{label:'Desempeño',data:pcts,backgroundColor:'rgba(83,74,183,0.18)',borderColor:'#534AB7',borderWidth:2.5,pointBackgroundColor:colors,pointBorderColor:'#fff',pointBorderWidth:2,pointRadius:5,pointHoverRadius:7}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${pcts[ctx.dataIndex]}% (${dimScores[ctx.dataIndex].pts}/${dimScores[ctx.dataIndex].items*3} pts)`}}},scales:{r:{min:0,max:100,ticks:{stepSize:25,font:{size:9},color:'#aaa',backdropColor:'transparent'},grid:{color:'rgba(83,74,183,0.1)'},angleLines:{color:'rgba(83,74,183,0.12)'},pointLabels:{font:{size:10,family:'Montserrat',weight:'600'},color:'#444'}}}}
+  });
+
+  // Leyenda
+  const legendEl=document.getElementById('radar-legend');
+  const sorted=[...dimScores].sort((a,b)=>b.pct-a.pct);
+  legendEl.innerHTML=sorted.map(d=>`<div class="legend-row"><span class="legend-dot" style="background:${d.color}"></span><span class="legend-label">${d.label}</span><div class="legend-bar-bg"><div class="legend-bar-fill" style="width:${d.pct}%;background:${d.color}"></div></div><span class="legend-pct" style="color:${colorByPct(d.pct)}">${d.pct}%</span></div>`).join('');
+
+  // Barras horizontales
+  chartInstances.barras=new Chart(document.getElementById('chart-barras'),{
+    type:'bar',
+    data:{labels:shortL,datasets:[{label:'%',data:pcts,backgroundColor:colors.map(c=>c+'CC'),borderColor:colors,borderWidth:1.5,borderRadius:6,borderSkipped:false}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${pcts[ctx.dataIndex]}%  (${dimScores[ctx.dataIndex].pts}/${dimScores[ctx.dataIndex].items*3} pts)`}}},scales:{x:{min:0,max:100,ticks:{font:{size:10}},grid:{color:'#f0effe'}},y:{ticks:{font:{size:10,family:'Montserrat',weight:'600'}}}}}
+  });
+
+  // Detalle ítems
+  const itemLabels=[],itemData=[],itemColors=[];
+  dimensiones.forEach(dim=>{
+    dim.names.forEach((name,idx)=>{
+      const v=getVal(name)||0;
+      itemLabels.push(dim.id.toUpperCase().replace('D','D')+' '+(idx+1));
+      itemData.push(Math.round((v/3)*100));
+      itemColors.push((v===3?'#0F6E56':v===2?'#534AB7':'#A32D2D')+'CC');
+    });
+  });
+  chartInstances.detalle=new Chart(document.getElementById('chart-detalle'),{
+    type:'bar',
+    data:{labels:itemLabels,datasets:[{label:'Nivel',data:itemData,backgroundColor:itemColors,borderRadius:4,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{const v=itemData[ctx.dataIndex];return ` Nivel ${v===100?'Alto':v===67?'Medio':'Bajo'} (${v}%)`;}}}},scales:{y:{min:0,max:100,ticks:{font:{size:9}},grid:{color:'#f0effe'}},x:{ticks:{font:{size:9,family:'Montserrat',weight:'600'}}}}}
+  });
+}
+
+function buildProgressBars(dimScores){
+  const el=document.getElementById('progress-section');
+  let html=`<div style="font-weight:700;font-size:13px;color:#26215C;margin-bottom:14px">📋 Detalle por dimensión e ítems</div>`;
+  dimScores.forEach(dim=>{
+    const c=colorByPct(dim.pct);
+    html+=`<div class="progress-block"><div class="progress-block-title" style="color:${dim.color};border-color:${dim.color}33">${dim.label}</div>
+    <div class="prog-row"><div class="prog-header"><span class="prog-name" style="font-weight:700;color:#26215C">${dim.pts}/${dim.items*3} puntos</span><span class="prog-val" style="color:${c}">${dim.pct}%</span></div>
+    <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:${dim.pct}%;background:${dim.color}"></div></div></div>
+    <div class="prog-item-list">`;
+    dim.names.forEach((name,idx)=>{
+      const v=getVal(name)||0;
+      const ic=v===3?'#0F6E56':v===2?'#534AB7':'#A32D2D';
+      const ibg=v===3?'#E1F5EE':v===2?'#EEEDFE':'#FCEBEB';
+      const lbl=v===3?'Alto':v===2?'Medio':'Bajo';
+      html+=`<div class="prog-item-row"><span class="prog-item-name">${dim.descs[idx]}</span><span class="prog-item-chip" style="background:${ibg};color:${ic}">${lbl} (${v})</span></div>`;
+    });
+    html+=`</div></div>`;
+  });
+  el.innerHTML=html;
+}
+
+function buildPlan(dimScores){
+  const sorted=[...dimScores].sort((a,b)=>a.pct-b.pct).slice(0,3);
+  document.getElementById('plan-items').innerHTML=sorted.map(dim=>{
+    const bajos=dim.names.map((n,i)=>({desc:dim.descs[i],v:getVal(n)||0})).filter(x=>x.v<3);
+    return `<div class="plan-card" style="border-left-color:${dim.color}">
+      <div class="plan-card-title" style="color:${dim.color}">${dim.label} — ${dim.pct}%</div>
+      <div class="plan-card-body">
+        ${bajos.map(x=>`• <strong>Ítem calificado en nivel ${x.v}:</strong> ${x.desc}`).join('<br>')}
+        <div style="margin-top:6px;padding-top:6px;border-top:1px dashed #e0daf5">${dim.acciones.map(a=>`▸ ${a}`).join('<br>')}</div>
+      </div></div>`;
+  }).join('');
+  document.getElementById('plan-section').style.display='block';
+}
+
+function descargarPDF(){
+  if(!globalData.nombre){alert('Completa el nombre del colaborador antes de descargar.');return;}
+  const{jsPDF}=window.jspdf;const doc=new jsPDF();
+  doc.setFillColor(83,74,183);doc.rect(0,0,210,36,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(180,170,230);
+  doc.text('ETAPA 3 — SEMILLERO DE TALENTOS · SPECTRUM BRANDS',20,9);
+  doc.setFontSize(16);doc.setTextColor(255,255,255);doc.text('Seguimiento Etapa Productiva',20,19);
+  doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(180,170,220);
+  doc.text('Spectrum Brands · EFICACIA S.A.S. · 6 dimensiones · 18 ítems',20,27);
+  doc.text(new Date().toLocaleDateString('es-CO'),190,27,{align:'right'});
+  let y=45;doc.setTextColor(0,0,0);doc.setFontSize(9);
+  [['Colaborador:',globalData.nombre],['Cédula:',globalData.cedula||'—'],['Cliente:',globalData.cliente||'—'],['Cupo:',globalData.cupo||'—'],['Zona:',globalData.zona||'—']].forEach(([lbl,val],i)=>{
+    const col=i%2===0?20:110,row=y+Math.floor(i/2)*7;
+    doc.setFont('helvetica','bold');doc.text(lbl,col,row);doc.setFont('helvetica','normal');doc.text(String(val),col+25,row);
+  });
+  y+=22;
+  doc.setFillColor(248,247,255);doc.roundedRect(20,y,170,24,4,4,'F');
+  doc.setDrawColor(83,74,183);doc.setLineWidth(0.5);doc.roundedRect(20,y,170,24,4,4,'S');
+  doc.setFont('helvetica','bold');doc.setFontSize(22);doc.setTextColor(83,74,183);
+  doc.text(globalData.totalPts+'/54',105,y+12,{align:'center'});
+  doc.setFontSize(9);doc.setTextColor(100,100,100);doc.setFont('helvetica','normal');
+  doc.text(globalData.pct+'%  ·  '+globalData.perfil,105,y+21,{align:'center'});
+  y+=32;
+  doc.setFillColor(83,74,183);doc.rect(20,y,170,7,'F');doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(255,255,255);
+  doc.text('Resultados por dimensión',25,y+5);y+=12;
+  dimensiones.forEach((dim,idx)=>{
+    const pts=globalData.dimPts[idx],max=dim.items*3,dpct=Math.round((pts/max)*100),barW=Math.round((pts/max)*100);
+    doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.setTextColor(30,30,30);doc.text(dim.label,25,y);
+    doc.setFont('helvetica','normal');doc.setTextColor(83,74,183);doc.text(pts+'/'+max+' ('+dpct+'%)',185,y,{align:'right'});
+    const rgb=hexToRgb(dim.color);
+    doc.setFillColor(235,233,250);doc.roundedRect(25,y+2,100,4,2,2,'F');
+    doc.setFillColor(rgb[0],rgb[1],rgb[2]);doc.roundedRect(25,y+2,barW,4,2,2,'F');
+    y+=11;if(y>265){doc.addPage();y=20;}
+  });
+  y+=4;doc.setFillColor(83,74,183);doc.rect(20,y,170,7,'F');doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(255,255,255);
+  doc.text('Dimensiones prioritarias de fortalecimiento',25,y+5);y+=12;
+  document.querySelectorAll('.plan-card').forEach(card=>{
+    const titulo=card.querySelector('.plan-card-title').textContent.trim();
+    const cuerpo=card.querySelector('.plan-card-body').innerText.trim();
+    const lines=doc.splitTextToSize(cuerpo,155);const boxH=Math.min(lines.length*4.5+14,52);
+    if(y+boxH>270){doc.addPage();y=20;}
+    doc.setFillColor(248,247,255);doc.rect(20,y,170,boxH,'F');doc.setDrawColor(200,200,200);doc.setLineWidth(0.3);doc.rect(20,y,170,boxH,'S');
+    doc.setFillColor(83,74,183);doc.rect(20,y,3,boxH,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(30,30,30);doc.text(titulo,25,y+6);
+    doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(70,70,70);
+    lines.slice(0,8).forEach((l,li)=>doc.text(l,25,y+12+li*4.5));y+=boxH+4;
+  });
+  doc.setFontSize(7);doc.setTextColor(160,160,160);doc.setFont('helvetica','normal');
+  doc.text('Generado por el Sistema CONVERTIR · Spectrum Brands · EFICACIA S.A.S. · '+new Date().toLocaleString('es-CO'),105,290,{align:'center'});
+  doc.save('Etapa3_'+globalData.nombre.replace(/ /g,'_')+'.pdf');
+}
+
+function enviarSheets(){
+  const st=document.getElementById('sheets-status');
+  const tsCO=new Date().toLocaleString('es-CO',{timeZone:'America/Bogota',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).replace(',','');
+  const row=[tsCO,globalData.nombre||'',globalData.cedula||'',globalData.cliente||'',globalData.cupo||'',globalData.zona||'',globalData.totalPts||'',globalData.pct+'%',globalData.perfil||'',18,...(globalData.dimPts||[])];
+  const SHEET_URL='https://script.google.com/macros/s/AKfycbzv9MvljOIlcw-_ujQQPDp7QrjQetHOwN-bOyXmsSxwYEc3iinCUJHA2KL0LfPAIXwD/exec';
+  if(st){st.textContent='Guardando...';st.style.color='#534AB7';}
+  fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tipo:'etapa3_seguimiento',datos:row})})
+  .then(()=>{if(st){st.textContent='✓ Datos guardados automáticamente.';st.style.color='#0F6E56';}})
+  .catch(()=>{if(st){st.textContent='⚠ No se pudo guardar. Revisa tu conexión.';st.style.color='#854F0B';}});
+}
+</script>
+</body>
+</html>

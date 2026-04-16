@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Administrador — Semillero de Talentos</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#534AB7;--purple-dark:#3C3489;--purple-light:#EEEDFE;
+  --green:#0F6E56;--green-light:#E1F5EE;
+  --gold:#C49A1A;--gold-light:#FEF8E6;
+  --red:#A32D2D;--red-light:#FCEBEB;
+  --orange:#854F0B;--orange-light:#FAEEDA;
+  --teal:#0E7490;--teal-light:#E0F7FA;
+  --bg:#f4f3fc;--sidebar:#26215C;
+  --white:#fff;--text:#1a1a1a;--muted:#666;--border:#e8e6f5;
+}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:220px;flex-shrink:0;background:var(--sidebar);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;z-index:50;
+  padding:24px 0;
+}
+.sidebar-brand{padding:0 20px 24px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:16px}
+.sidebar-logo{width:36px;height:36px;background:var(--purple);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Montserrat',sans-serif;font-weight:900;font-size:12px;margin-bottom:8px}
+.sidebar-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:13px;color:#fff;line-height:1.3}
+.sidebar-sub{font-size:10px;color:rgba(255,255,255,0.45);margin-top:2px}
+.nav-label{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.3);padding:8px 20px 4px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 20px;font-size:13px;color:rgba(255,255,255,0.65);
+  cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;
+  font-family:'DM Sans',sans-serif;
+}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:#fff}
+.nav-item.active{background:rgba(83,74,183,0.35);color:#fff;border-right:3px solid var(--purple)}
+.nav-item svg{width:16px;height:16px;flex-shrink:0;opacity:.8}
+.nav-item.active svg{opacity:1}
+.sidebar-footer{margin-top:auto;padding:16px 20px;border-top:1px solid rgba(255,255,255,0.08)}
+.btn-logout{
+  display:flex;align-items:center;gap:8px;
+  width:100%;padding:8px 12px;background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.12);border-radius:8px;
+  color:rgba(255,255,255,0.6);font-size:12px;cursor:pointer;
+  font-family:'DM Sans',sans-serif;transition:all .2s;
+}
+.btn-logout:hover{background:rgba(163,45,45,0.3);color:#fff;border-color:rgba(163,45,45,0.5)}
+.btn-logout svg{width:14px;height:14px}
+
+/* ── MAIN ── */
+.main{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{
+  background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);padding:0 28px;
+  height:60px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:40;
+}
+.topbar-left h1{font-family:'Montserrat',sans-serif;font-weight:800;font-size:18px;color:var(--purple-dark)}
+.topbar-left p{font-size:12px;color:var(--muted)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.admin-pill{
+  display:flex;align-items:center;gap:6px;
+  background:var(--purple-light);color:var(--purple-dark);
+  padding:6px 12px;border-radius:99px;font-size:12px;font-weight:600;
+  font-family:'Montserrat',sans-serif;
+}
+.admin-pill svg{width:14px;height:14px}
+.btn-refresh{
+  padding:7px 12px;background:var(--purple);color:#fff;border:none;
+  border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;
+  font-family:'Montserrat',sans-serif;display:flex;align-items:center;gap:5px;transition:background .2s;
+}
+.btn-refresh:hover{background:var(--purple-dark)}
+.btn-refresh svg{width:13px;height:13px}
+
+.content{padding:24px 28px;flex:1}
+
+/* ── PAGES ── */
+.page{display:none}.page.active{display:block}
+
+/* ── KPI CARDS ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px}
+.kpi{
+  background:#fff;border-radius:14px;padding:18px;
+  border:1px solid var(--border);
+  position:relative;overflow:hidden;
+}
+.kpi::after{
+  content:'';position:absolute;top:0;right:0;width:70px;height:70px;
+  border-radius:0 14px 0 70px;
+  background:var(--kpi-color,var(--purple-light));opacity:.3;
+}
+.kpi-icon{font-size:22px;margin-bottom:8px}
+.kpi-val{font-family:'Montserrat',sans-serif;font-size:28px;font-weight:900;color:var(--kpi-color,var(--purple));line-height:1}
+.kpi-lbl{font-size:11px;color:var(--muted);margin-top:4px}
+.kpi-sub{font-size:10px;margin-top:3px;font-weight:600}
+
+/* ALERT KPI */
+.kpi-alert{--kpi-color:#A32D2D;border:1.5px solid rgba(163,45,45,0.25);animation:pulse-border 2s infinite}
+@keyframes pulse-border{0%,100%{border-color:rgba(163,45,45,0.25)}50%{border-color:rgba(163,45,45,0.6)}}
+.kpi-alert .kpi-val{color:#A32D2D}
+.kpi-alert::after{background:#FCEBEB;opacity:.5}
+
+/* ── CHARTS ── */
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+.chart-card{background:#fff;border-radius:14px;padding:20px;border:1px solid var(--border)}
+.chart-card.full{grid-column:1/-1}
+.chart-title{font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:var(--purple-dark);margin-bottom:4px}
+.chart-sub{font-size:11px;color:var(--muted);margin-bottom:14px}
+.chart-wrap{position:relative;height:220px}
+
+/* ── ALERT SECTION ── */
+.alert-header{
+  background:linear-gradient(135deg,#A32D2D,#7a1c1c);
+  border-radius:14px;padding:18px 22px;margin-bottom:18px;
+  display:flex;align-items:center;gap:16px;
+}
+.alert-icon{font-size:28px}
+.alert-header h2{font-family:'Montserrat',sans-serif;font-weight:800;font-size:16px;color:#fff;margin-bottom:2px}
+.alert-header p{font-size:12px;color:rgba(255,255,255,0.7)}
+.alert-count{
+  margin-left:auto;background:rgba(255,255,255,0.15);
+  padding:8px 16px;border-radius:8px;text-align:center;
+  color:#fff;font-family:'Montserrat',sans-serif;
+}
+.alert-count strong{display:block;font-size:26px;font-weight:900;line-height:1}
+.alert-count span{font-size:10px;opacity:.8}
+
+.promotor-list{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.promotor-row{
+  background:#fff;border-radius:12px;padding:14px 18px;
+  border:1px solid var(--border);
+  display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;
+}
+.promotor-row.critico{border-left:4px solid #A32D2D}
+.promotor-row.bajo{border-left:4px solid #C49A1A}
+.promotor-name{font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:2px}
+.promotor-meta{font-size:11px;color:var(--muted)}
+.promotor-scores{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.score-chip{
+  font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;
+  font-family:'Montserrat',sans-serif;
+}
+.score-chip.rojo{background:#FCEBEB;color:#A32D2D}
+.score-chip.naranja{background:#FAEEDA;color:#854F0B}
+.score-chip.ok{background:#E1F5EE;color:#0F6E56}
+.nivel-badge{
+  padding:5px 12px;border-radius:99px;font-size:11px;font-weight:700;
+  font-family:'Montserrat',sans-serif;text-align:center;
+}
+
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;background:#fff;font-size:12px}
+th{background:#f8f7ff;color:var(--purple-dark);font-family:'Montserrat',sans-serif;font-weight:700;font-size:11px;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid #f5f4fc;color:var(--text)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fdfcff}
+
+.filter-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.filter-bar input,.filter-bar select{
+  padding:7px 11px;border:1.5px solid var(--border);border-radius:8px;
+  font-size:12px;font-family:'DM Sans',sans-serif;background:#fff;color:var(--text);
+}
+.filter-bar input:focus,.filter-bar select:focus{outline:none;border-color:var(--purple)}
+.filter-bar input{flex:1;min-width:200px}
+
+/* ── LOADING ── */
+.loading-overlay{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:60px 20px;color:var(--muted);gap:12px;
+}
+.spinner{
+  width:36px;height:36px;border:3px solid var(--purple-light);
+  border-top-color:var(--purple);border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:50px 20px;color:var(--muted)}
+.empty-icon{font-size:36px;margin-bottom:10px}
+.empty-state p{font-size:13px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .sidebar{width:0;overflow:hidden}
+  .main{margin-left:0}
+  .charts-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-logo">SB</div>
+    <div class="sidebar-title">Semillero<br>de Talentos</div>
+    <div class="sidebar-sub">Panel Administrador</div>
+  </div>
+
+  <div class="nav-label">Principal</div>
+  <button class="nav-item active" onclick="showPage('resumen')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Resumen General
+  </button>
+  <button class="nav-item" onclick="showPage('alertas')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Plan de Intervención
+  </button>
+  <button class="nav-item" onclick="showPage('autoevaluaciones')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    Autoevaluaciones
+  </button>
+  <button class="nav-item" onclick="showPage('etapa3')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    Etapa 3 — Seguimiento
+  </button>
+
+  <div class="sidebar-footer">
+    <button class="btn-logout" onclick="logout()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Cerrar sesión
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1 id="page-title">Resumen General</h1>
+      <p id="page-sub">Cargando datos desde Google Sheets...</p>
+    </div>
+    <div class="topbar-right">
+      <div class="admin-pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <span id="admin-name">Administrador</span>
+      </div>
+      <button class="btn-refresh" onclick="loadAllData()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-5"/></svg>
+        Actualizar
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══════════════════ PAGE: RESUMEN ═══════════════════ -->
+    <div class="page active" id="page-resumen">
+      <!-- KPIs -->
+      <div class="kpi-grid" id="kpi-grid">
+        <div class="loading-overlay"><div class="spinner"></div><span style="font-size:12px">Cargando...</span></div>
+      </div>
+      <!-- Charts -->
+      <div class="charts-grid" id="charts-resumen">
+        <div class="chart-card">
+          <div class="chart-title">Distribución de Niveles</div>
+          <div class="chart-sub">Autoevaluaciones — todos los registros</div>
+          <div class="chart-wrap"><canvas id="chart-niveles"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Promedio por Regional</div>
+          <div class="chart-sub">Puntaje promedio general por zona</div>
+          <div class="chart-wrap"><canvas id="chart-regional"></canvas></div>
+        </div>
+        <div class="chart-card full">
+          <div class="chart-title">Comparativo Habilidades Blandas vs Duras</div>
+          <div class="chart-sub">Promedio por regional</div>
+          <div class="chart-wrap"><canvas id="chart-blandas-duras"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ PAGE: ALERTAS ═══════════════════ -->
+    <div class="page" id="page-alertas">
+      <div class="alert-header">
+        <div class="alert-icon">🚨</div>
+        <div>
+          <h2>Promotores que requieren Plan de Intervención</h2>
+          <p>Colaboradores con rendimiento crítico (&lt;50%) o bajo (50–65%) que necesitan acompañamiento urgente</p>
+        </div>
+        <div class="alert-count">
+          <strong id="alert-total-count">—</strong>
+          <span>promotores</span>
+        </div>
+      </div>
+      <div id="alertas-list">
+        <div class="loading-overlay"><div class="spinner"></div><span style="font-size:12px">Analizando datos...</span></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ PAGE: AUTOEVALUACIONES ═══════════════════ -->
+    <div class="page" id="page-autoevaluaciones">
+      <div class="filter-bar">
+        <input type="text" id="search-auto" placeholder="🔍 Buscar por nombre o cédula..." oninput="renderAutoTable()">
+        <select id="filter-regional" onchange="renderAutoTable()">
+          <option value="">Todas las regionales</option>
+          <option>Antioquia</option><option>Centro</option><option>Eje Cafetero</option>
+          <option>Norte</option><option>Occidente</option><option>Oriente</option>
+        </select>
+        <select id="filter-nivel" onchange="renderAutoTable()">
+          <option value="">Todos los niveles</option>
+          <option>Destacado</option><option>Competente</option><option>En proceso</option><option>En desarrollo</option>
+        </select>
+        <button style="padding:7px 12px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-family:'Montserrat',sans-serif;font-weight:600" onclick="exportCSV('auto')">⬇ CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th><th>Cédula</th><th>Regional</th><th>Cadena</th>
+              <th>Blandas</th><th>Duras</th><th>Total</th><th>Nivel</th><th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-auto"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ PAGE: ETAPA 3 ═══════════════════ -->
+    <div class="page" id="page-etapa3">
+      <div class="filter-bar">
+        <input type="text" id="search-etapa3" placeholder="🔍 Buscar por nombre o cédula..." oninput="renderEtapa3Table()">
+        <select id="filter-zona" onchange="renderEtapa3Table()">
+          <option value="">Todas las zonas</option>
+          <option>CENTRO</option><option>NORTE</option><option>ANTIOQUIA</option><option>OCCIDENTE</option>
+        </select>
+        <button style="padding:7px 12px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-family:'Montserrat',sans-serif;font-weight:600" onclick="exportCSV('etapa3')">⬇ CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th><th>Cédula</th><th>Cliente</th><th>Zona</th><th>Cupo</th>
+              <th>Puntaje</th><th>%</th><th>Nivel</th><th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-etapa3"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+/* ══════════════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════════════ */
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzv9MvljOIlcw-_ujQQPDp7QrjQetHOwN-bOyXmsSxwYEc3iinCUJHA2KL0LfPAIXwD/exec';
+
+// Auth check
+if(!sessionStorage.getItem('sb_admin')){
+  window.location.href = 'semillero_talentos.html';
+}
+document.getElementById('admin-name').textContent = sessionStorage.getItem('sb_admin_user') || 'Admin';
+
+function logout(){
+  sessionStorage.removeItem('sb_admin');
+  sessionStorage.removeItem('sb_admin_user');
+  window.location.href = 'semillero_talentos.html';
+}
+
+/* ══════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════ */
+let dataAuto = [];
+let dataEtapa3 = [];
+let chartsBuilt = false;
+let chartInstances = {};
+
+/* ══════════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════════ */
+const pageTitles = {
+  resumen:         ['Resumen General',             'Vista consolidada de todas las evaluaciones'],
+  alertas:         ['Plan de Intervención',         'Promotores con rendimiento crítico o bajo'],
+  autoevaluaciones:['Autoevaluaciones',             'Registros de autoevaluación de competencias'],
+  etapa3:          ['Etapa 3 — Seguimiento',        'Registros de seguimiento etapa productiva'],
+};
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{ if(n.getAttribute('onclick')?.includes(id)) n.classList.add('active'); });
+  document.getElementById('page-title').textContent = pageTitles[id][0];
+  document.getElementById('page-sub').textContent = pageTitles[id][1];
+}
+
+/* ══════════════════════════════════════════════════
+   LOAD DATA
+══════════════════════════════════════════════════ */
+async function loadAllData(){
+  document.getElementById('page-sub').textContent = 'Actualizando datos...';
+  try {
+    const res = await fetch(SHEET_URL + '?action=getAll', {mode:'cors'});
+    const json = await res.json();
+    processData(json);
+  } catch(e){
+    // Fallback: use demo data for development/preview
+    console.warn('No se pudo conectar a Sheets, usando datos demo:', e);
+    processData(getDemoData());
+  }
+  document.getElementById('page-sub').textContent = 'Última actualización: '+new Date().toLocaleString('es-CO',{timeZone:'America/Bogota'});
+}
+
+function processData(json){
+  // Parse autoevaluaciones
+  if(json.autoevaluacion && Array.isArray(json.autoevaluacion)){
+    dataAuto = json.autoevaluacion.map(r => ({
+      fecha:    r[0]||'',
+      nombre:   r[1]||'',
+      regional: r[3]||'',
+      pdv:      r[4]||'',
+      cadena:   r[5]||'',
+      fechaEv:  r[6]||'',
+      pctB:     parseFloat(r[7])||0,
+      pctD:     parseFloat(r[8])||0,
+      pctTotal: parseFloat(r[9])||0,
+      perfil:   r[10]||'',
+      cedula:   r[13]||'',
+    }));
+  }
+
+  // Parse etapa3
+  if(json.etapa3_seguimiento && Array.isArray(json.etapa3_seguimiento)){
+    dataEtapa3 = json.etapa3_seguimiento.map(r => ({
+      fecha:   r[0]||'',
+      nombre:  r[1]||'',
+      cedula:  r[2]||'',
+      cliente: r[3]||'',
+      cupo:    r[4]||'',
+      zona:    r[5]||'',
+      pts:     parseFloat(r[6])||0,
+      pct:     parseFloat(r[7])||0,
+      nivel:   r[8]||'',
+      items:   r[9]||'',
+    }));
+  }
+
+  buildDashboard();
+}
+
+/* ══════════════════════════════════════════════════
+   DEMO DATA (when Sheets is unavailable)
+══════════════════════════════════════════════════ */
+function getDemoData(){
+  const perfiles = ['En desarrollo','En desarrollo','En proceso','En proceso','Competente','Competente','Competente','Destacado'];
+  const regionales = ['Antioquia','Centro','Eje Cafetero','Norte','Occidente','Oriente'];
+  const nombres = ['Carlos Ruiz','María López','Juan García','Ana Torres','Pedro Díaz','Laura Gómez','Sergio Martín','Valentina Ríos','Felipe Castro','Diana Mora','Andrés Pinto','Camila Vera','Oscar Reyes','Natalia Cruz'];
+  const auto = nombres.map((n,i) => {
+    const pctB = 30+Math.floor(Math.random()*60);
+    const pctD = 30+Math.floor(Math.random()*60);
+    const tot = Math.round((pctB+pctD)/2);
+    const perfil = tot<50?'En desarrollo':tot<66?'En proceso':tot<80?'Competente':'Destacado';
+    return { fecha:'2026-04-'+String((i%28)+1).padStart(2,'0'), nombre:n, regional:regionales[i%6], pdv:'Tienda '+i, cadena:'ALMACENES ÉXITO S.A', fechaEv:'2026-04-01', pctB, pctD, pctTotal:tot, perfil, cedula:'100000'+i };
+  });
+  const etapa3 = nombres.slice(0,8).map((n,i) => {
+    const pts = 18+Math.floor(Math.random()*36);
+    const pct = Math.round((pts/54)*100);
+    const nivel = pct<62?'Nivel Bajo':pct<85?'Nivel Medio':'Nivel Alto';
+    return { fecha:'2026-04-'+String((i%28)+1).padStart(2,'0'), nombre:n, cedula:'100000'+i, cliente:'SPECTRUM BRANDS CORP SAS', cupo:'FIJO', zona:['CENTRO','NORTE','ANTIOQUIA','OCCIDENTE'][i%4], pts, pct, nivel, items:18 };
+  });
+  return { autoevaluacion: auto.map(r=>[r.fecha,r.nombre,'',r.regional,r.pdv,r.cadena,r.fechaEv,r.pctB,r.pctD,r.pctTotal,r.perfil,'','',r.cedula]), etapa3_seguimiento: etapa3.map(r=>[r.fecha,r.nombre,r.cedula,r.cliente,r.cupo,r.zona,r.pts,r.pct,r.nivel,r.items]) };
+}
+
+/* ══════════════════════════════════════════════════
+   BUILD DASHBOARD
+══════════════════════════════════════════════════ */
+function buildDashboard(){
+  buildKPIs();
+  buildCharts();
+  buildAlertas();
+  renderAutoTable();
+  renderEtapa3Table();
+}
+
+/* ── KPIs ── */
+function buildKPIs(){
+  const total = dataAuto.length;
+  const destacados = dataAuto.filter(r=>r.perfil==='Destacado').length;
+  const competentes = dataAuto.filter(r=>r.perfil==='Competente').length;
+  const criticos = dataAuto.filter(r=>r.pctTotal<50).length;
+  const bajos = dataAuto.filter(r=>r.pctTotal>=50&&r.pctTotal<66).length;
+  const intervencion = criticos + bajos;
+  const promedio = total ? Math.round(dataAuto.reduce((a,r)=>a+r.pctTotal,0)/total) : 0;
+  const etapa3Total = dataEtapa3.length;
+
+  const kpis = [
+    {icon:'👥',val:total,lbl:'Promotores evaluados',sub:'Autoevaluaciones',color:'var(--purple)',bg:'var(--purple-light)',extra:''},
+    {icon:'⭐',val:destacados+competentes,lbl:'Nivel Competente o superior',sub:destacados+' Destacados · '+competentes+' Competentes',color:'var(--green)',bg:'var(--green-light)',extra:''},
+    {icon:'📊',val:promedio+'%',lbl:'Promedio general',sub:'Todas las regionales',color:'var(--teal)',bg:'var(--teal-light)',extra:''},
+    {icon:'📋',val:etapa3Total,lbl:'Seguimientos Etapa 3',sub:'Registros completados',color:'var(--gold)',bg:'var(--gold-light)',extra:''},
+    {icon:'🚨',val:intervencion,lbl:'Requieren intervención',sub:criticos+' críticos (<50%) · '+bajos+' bajos (50–65%)',color:'var(--red)',bg:'var(--red-light)',extra:'alert',isAlert:true},
+  ];
+
+  const grid = document.getElementById('kpi-grid');
+  grid.innerHTML = kpis.map(k=>`
+    <div class="kpi ${k.isAlert?'kpi-alert':''}" style="--kpi-color:${k.color}">
+      <div class="kpi-icon">${k.icon}</div>
+      <div class="kpi-val">${k.val}</div>
+      <div class="kpi-lbl">${k.lbl}</div>
+      <div class="kpi-sub" style="color:${k.color}">${k.sub}</div>
+    </div>`).join('');
+}
+
+/* ── CHARTS ── */
+function buildCharts(){
+  // Destroy previous if exist
+  Object.values(chartInstances).forEach(c=>c&&c.destroy&&c.destroy());
+  chartInstances = {};
+
+  // 1. Distribución niveles
+  const nivCount = {Destacado:0,Competente:0,'En proceso':0,'En desarrollo':0};
+  dataAuto.forEach(r=>{ if(nivCount[r.perfil]!==undefined) nivCount[r.perfil]++; });
+  chartInstances.niveles = new Chart(document.getElementById('chart-niveles'), {
+    type:'doughnut',
+    data:{
+      labels:Object.keys(nivCount),
+      datasets:[{data:Object.values(nivCount),backgroundColor:['#0F6E56','#185FA5','#854F0B','#A32D2D'],borderWidth:0,hoverOffset:6}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11,family:'Montserrat'},padding:12}}}}
+  });
+
+  // 2. Promedio por regional
+  const regionals = ['Antioquia','Centro','Eje Cafetero','Norte','Occidente','Oriente'];
+  const regAvg = regionals.map(reg=>{
+    const items = dataAuto.filter(r=>r.regional===reg);
+    return items.length ? Math.round(items.reduce((a,r)=>a+r.pctTotal,0)/items.length) : 0;
+  });
+  chartInstances.regional = new Chart(document.getElementById('chart-regional'), {
+    type:'bar',
+    data:{
+      labels:regionals.map(r=>r.length>10?r.slice(0,10)+'…':r),
+      datasets:[{label:'Promedio %',data:regAvg,backgroundColor:'#534AB7',borderRadius:6,borderSkipped:false}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{y:{min:0,max:100,ticks:{font:{size:10}},grid:{color:'#f0effe'}},x:{ticks:{font:{size:10}}}}
+    }
+  });
+
+  // 3. Blandas vs Duras por regional
+  const regB = regionals.map(reg=>{ const items=dataAuto.filter(r=>r.regional===reg); return items.length?Math.round(items.reduce((a,r)=>a+r.pctB,0)/items.length):0; });
+  const regD = regionals.map(reg=>{ const items=dataAuto.filter(r=>r.regional===reg); return items.length?Math.round(items.reduce((a,r)=>a+r.pctD,0)/items.length):0; });
+  chartInstances.bld = new Chart(document.getElementById('chart-blandas-duras'), {
+    type:'bar',
+    data:{
+      labels:regionals,
+      datasets:[
+        {label:'Habilidades Blandas',data:regB,backgroundColor:'#534AB7',borderRadius:4},
+        {label:'Habilidades Duras',data:regD,backgroundColor:'#0F6E56',borderRadius:4}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11,family:'Montserrat'},padding:14}}},
+      scales:{y:{min:0,max:100,ticks:{font:{size:10}},grid:{color:'#f0effe'}},x:{ticks:{font:{size:10}}}}
+    }
+  });
+}
+
+/* ── ALERTAS ── */
+function buildAlertas(){
+  const criticos = dataAuto.filter(r=>r.pctTotal<50).sort((a,b)=>a.pctTotal-b.pctTotal);
+  const bajos    = dataAuto.filter(r=>r.pctTotal>=50&&r.pctTotal<66).sort((a,b)=>a.pctTotal-b.pctTotal);
+  const all = [...criticos,...bajos];
+
+  document.getElementById('alert-total-count').textContent = all.length;
+
+  if(!all.length){
+    document.getElementById('alertas-list').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">✅</div>
+        <p>No hay promotores en estado crítico o bajo en este momento.</p>
+      </div>`;
+    return;
+  }
+
+  const html = all.map(r => {
+    const isCrit = r.pctTotal < 50;
+    const nivelColor = isCrit ? '#A32D2D' : '#854F0B';
+    const nivelBg = isCrit ? '#FCEBEB' : '#FAEEDA';
+    const nivelLabel = isCrit ? '🔴 Crítico' : '🟠 Bajo';
+    return `
+      <div class="promotor-row ${isCrit?'critico':'bajo'}">
+        <div>
+          <div class="promotor-name">${esc(r.nombre)||'Sin nombre'}</div>
+          <div class="promotor-meta">📍 ${esc(r.regional)} · 🏬 ${esc(r.cadena||r.pdv)} · 🗓 ${esc(r.fechaEv)}</div>
+          <div class="promotor-scores">
+            <span class="score-chip ${r.pctB<50?'rojo':'naranja'}">Blandas: ${r.pctB}%</span>
+            <span class="score-chip ${r.pctD<50?'rojo':'naranja'}">Duras: ${r.pctD}%</span>
+            <span class="score-chip ${r.pctTotal<50?'rojo':r.pctTotal<66?'naranja':'ok'}">Total: ${r.pctTotal}%</span>
+          </div>
+        </div>
+        <div class="nivel-badge" style="background:${nivelBg};color:${nivelColor}">${nivelLabel}</div>
+      </div>`;
+  }).join('');
+
+  const rec = `
+    <div style="background:#fff;border-radius:12px;padding:16px 20px;border:1px solid var(--border);margin-top:14px">
+      <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:var(--purple-dark);margin-bottom:10px">📌 Acciones recomendadas</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.8">
+        • <strong>Reunión de seguimiento</strong> individual con cada promotor en estado crítico.<br>
+        • <strong>Asignar tutor o acompañante</strong> de la regional con mayor puntaje.<br>
+        • <strong>Plan de formación</strong> de 30 días enfocado en las competencias con menor puntaje.<br>
+        • <strong>Re-evaluación</strong> al final del plan para medir avance.
+      </div>
+    </div>`;
+
+  document.getElementById('alertas-list').innerHTML = `<div class="promotor-list">${html}</div>${rec}`;
+}
+
+/* ── TABLES ── */
+function renderAutoTable(){
+  const search = document.getElementById('search-auto').value.toLowerCase();
+  const reg    = document.getElementById('filter-regional').value;
+  const niv    = document.getElementById('filter-nivel').value;
+  const filtered = dataAuto.filter(r =>
+    (!search || r.nombre.toLowerCase().includes(search) || r.cedula.includes(search)) &&
+    (!reg || r.regional===reg) &&
+    (!niv || r.perfil===niv)
+  );
+  const tbody = document.getElementById('tbody-auto');
+  if(!filtered.length){ tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#999;padding:24px">Sin registros para los filtros seleccionados</td></tr>'; return; }
+  const nivelColors = {Destacado:['#E1F5EE','#0F6E56'],Competente:['#E6F1FB','#185FA5'],'En proceso':['#FAEEDA','#854F0B'],'En desarrollo':['#FCEBEB','#A32D2D']};
+  tbody.innerHTML = filtered.map(r => {
+    const nc = nivelColors[r.perfil]||['#f5f5f5','#666'];
+    return `<tr>
+      <td style="font-weight:600">${esc(r.nombre)}</td>
+      <td>${esc(r.cedula)}</td>
+      <td>${esc(r.regional)}</td>
+      <td style="font-size:11px">${esc(r.cadena||'—')}</td>
+      <td><span style="color:${r.pctB<66?'#A32D2D':'#0F6E56'};font-weight:700">${r.pctB}%</span></td>
+      <td><span style="color:${r.pctD<66?'#A32D2D':'#0F6E56'};font-weight:700">${r.pctD}%</span></td>
+      <td><strong>${r.pctTotal}%</strong></td>
+      <td><span style="background:${nc[0]};color:${nc[1]};padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;font-family:'Montserrat',sans-serif">${esc(r.perfil)}</span></td>
+      <td style="font-size:11px;color:#999">${esc(r.fechaEv)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderEtapa3Table(){
+  const search = document.getElementById('search-etapa3').value.toLowerCase();
+  const zona   = document.getElementById('filter-zona').value;
+  const filtered = dataEtapa3.filter(r =>
+    (!search || r.nombre.toLowerCase().includes(search) || r.cedula.includes(search)) &&
+    (!zona || r.zona===zona)
+  );
+  const tbody = document.getElementById('tbody-etapa3');
+  if(!filtered.length){ tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#999;padding:24px">Sin registros para los filtros seleccionados</td></tr>'; return; }
+  const nivelColors = {'Nivel Alto':['#E1F5EE','#0F6E56'],'Nivel Medio':['#FAEEDA','#854F0B'],'Nivel Bajo':['#FCEBEB','#A32D2D']};
+  tbody.innerHTML = filtered.map(r => {
+    const nc = nivelColors[r.nivel]||['#f5f5f5','#666'];
+    return `<tr>
+      <td style="font-weight:600">${esc(r.nombre)}</td>
+      <td>${esc(r.cedula)}</td>
+      <td style="font-size:11px">${esc(r.cliente)}</td>
+      <td>${esc(r.zona)}</td>
+      <td>${esc(r.cupo)}</td>
+      <td style="font-weight:700">${r.pts}/54</td>
+      <td><strong>${r.pct}%</strong></td>
+      <td><span style="background:${nc[0]};color:${nc[1]};padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;font-family:'Montserrat',sans-serif">${esc(r.nivel)}</span></td>
+      <td style="font-size:11px;color:#999">${esc(r.fecha)}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── EXPORT ── */
+function exportCSV(type){
+  const data = type==='auto' ? dataAuto : dataEtapa3;
+  if(!data.length){ alert('No hay datos para exportar.'); return; }
+  let csv, filename;
+  if(type==='auto'){
+    csv = 'Nombre,Cedula,Regional,Cadena,Blandas%,Duras%,Total%,Nivel,Fecha\n'
+      + data.map(r=>[r.nombre,r.cedula,r.regional,r.cadena,r.pctB,r.pctD,r.pctTotal,r.perfil,r.fechaEv].join(',')).join('\n');
+    filename = 'autoevaluaciones_semillero.csv';
+  } else {
+    csv = 'Nombre,Cedula,Cliente,Zona,Cupo,Puntos,Pct%,Nivel,Fecha\n'
+      + data.map(r=>[r.nombre,r.cedula,r.cliente,r.zona,r.cupo,r.pts,r.pct,r.nivel,r.fecha].join(',')).join('\n');
+    filename = 'etapa3_semillero.csv';
+  }
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+}
+
+/* ── HELPERS ── */
+function esc(s){ return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ── INIT ── */
+loadAllData();
+</script>
+</body>
+</html>
