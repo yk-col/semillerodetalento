@@ -244,6 +244,49 @@ body{
 <div class="cards-section">
   <div class="section-label">Evaluaciones disponibles</div>
 
+  <!-- Card 1: Autoevaluación -->
+  <a href="autoevaluacion_CONVERTIR.html" class="eval-card card-purple">
+    <div class="card-icon">⭐</div>
+    <div class="card-body">
+      <div class="card-title">Autoevaluación de Competencias</div>
+      <div class="card-desc">Evalúa tus habilidades blandas y duras como promotor consultivo. Recibirás tu perfil y plan de mejora personalizado.</div>
+      <div class="card-tags">
+        <span class="tag">~10 minutos</span>
+        <span class="tag">40 preguntas</span>
+        <span class="tag">Habilidades blandas y duras</span>
+      </div>
+    </div>
+    <div class="card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+  </a>
+
+  <!-- Card 2: Evaluación CONVERTIR -->
+  <a href="evaluacion_CONVERTIR.html" class="eval-card card-gold">
+    <div class="card-icon">▲</div>
+    <div class="card-body">
+      <div class="card-title">Evaluación del Modelo CONVERTIR</div>
+      <div class="card-desc">Pon a prueba tu conocimiento y aplicación de las 9 etapas del modelo con casos prácticos reales del punto de venta.</div>
+      <div class="card-tags">
+        <span class="tag">~15 minutos</span>
+        <span class="tag">20 preguntas</span>
+      </div>
+    </div>
+    <div class="card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+  </a>
+
+  <!-- Card 3: Evaluación Ventas -->
+  <a href="evaluacion_ventas.html" class="eval-card card-green">
+    <div class="card-icon">◆</div>
+    <div class="card-body">
+      <div class="card-title">Evaluación de Conocimientos en Ventas</div>
+      <div class="card-desc">Mide tus conocimientos generales sobre técnicas de venta, manejo de clientes y estrategias comerciales en el canal moderno.</div>
+      <div class="card-tags">
+        <span class="tag">~15 minutos</span>
+        <span class="tag">20 preguntas</span>
+      </div>
+    </div>
+    <div class="card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+  </a>
+
   <!-- Card 4: Etapa 3 — NUEVO -->
   <a href="etapa3_seguimiento_productiva.html" class="eval-card card-teal">
     <div class="card-icon">📋</div>
@@ -293,6 +336,7 @@ body{
 /* ── Login ── */
 const ADMIN_USERS = {
   'admin': 'semillero2026',
+  'rrhh':  'rrhh2026',
   'coordinador': 'coord2026'
 };
 
@@ -302,7 +346,7 @@ function doLogin(){
   const err = document.getElementById('login-error');
   if(ADMIN_USERS[u] && ADMIN_USERS[u] === p){
     err.style.display='none';
-    sessionStorage.setItem('sb_admin','1');
+    sessionStorage.setItem('sb_ok','1');
     sessionStorage.setItem('sb_admin_user', u);
     window.location.href='dashboard_semillero.html';
   } else {

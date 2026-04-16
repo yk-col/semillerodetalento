@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Etapa 3 — Seguimiento Etapa Productiva</title>
+<title>Etapa 3 — Seguimiento Etapa Productiva · CONVERTIR</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -461,7 +461,7 @@ function enviarSheets(){
   const st=document.getElementById('sheets-status');
   const tsCO=new Date().toLocaleString('es-CO',{timeZone:'America/Bogota',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).replace(',','');
   const row=[tsCO,globalData.nombre||'',globalData.cedula||'',globalData.cliente||'',globalData.cupo||'',globalData.zona||'',globalData.totalPts||'',globalData.pct+'%',globalData.perfil||'',18,...(globalData.dimPts||[])];
-  const SHEET_URL='https://script.google.com/macros/s/AKfycbzv9MvljOIlcw-_ujQQPDp7QrjQetHOwN-bOyXmsSxwYEc3iinCUJHA2KL0LfPAIXwD/exec';
+  const SHEET_URL='https://script.google.com/macros/s/AKfycbwTbCSTY5_tygie8An40f8V-1k2lzik6buRNnF-KdcJTb5bBt8E6iWmFOL-CP28IzC_6Q/exec';
   if(st){st.textContent='Guardando...';st.style.color='#534AB7';}
   fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tipo:'etapa3_seguimiento',datos:row})})
   .then(()=>{if(st){st.textContent='✓ Datos guardados automáticamente.';st.style.color='#0F6E56';}})

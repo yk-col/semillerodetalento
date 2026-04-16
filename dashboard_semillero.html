@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Administrador — Semillero de Talentos</title>
+<title>Panel RRHH — Semillero de Talentos</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -11,691 +11,719 @@
 :root{
   --purple:#534AB7;--purple-dark:#3C3489;--purple-light:#EEEDFE;
   --green:#0F6E56;--green-light:#E1F5EE;
-  --gold:#C49A1A;--gold-light:#FEF8E6;
-  --red:#A32D2D;--red-light:#FCEBEB;
-  --orange:#854F0B;--orange-light:#FAEEDA;
-  --teal:#0E7490;--teal-light:#E0F7FA;
-  --bg:#f4f3fc;--sidebar:#26215C;
-  --white:#fff;--text:#1a1a1a;--muted:#666;--border:#e8e6f5;
+  --sidebar:#1E1A4E;--bg:#F0EFF9;--white:#fff;--text:#1a1a1a;--muted:#666;--border:#E2DFF5;
 }
-body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;-webkit-font-smoothing:antialiased}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 
-/* ── SIDEBAR ── */
-.sidebar{
-  width:220px;flex-shrink:0;background:var(--sidebar);
-  display:flex;flex-direction:column;
-  position:fixed;top:0;left:0;bottom:0;z-index:50;
-  padding:24px 0;
-}
-.sidebar-brand{padding:0 20px 24px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:16px}
-.sidebar-logo{width:36px;height:36px;background:var(--purple);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Montserrat',sans-serif;font-weight:900;font-size:12px;margin-bottom:8px}
-.sidebar-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:13px;color:#fff;line-height:1.3}
-.sidebar-sub{font-size:10px;color:rgba(255,255,255,0.45);margin-top:2px}
-.nav-label{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.3);padding:8px 20px 4px}
-.nav-item{
-  display:flex;align-items:center;gap:10px;
-  padding:9px 20px;font-size:13px;color:rgba(255,255,255,0.65);
-  cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;
-  font-family:'DM Sans',sans-serif;
-}
-.nav-item:hover{background:rgba(255,255,255,0.07);color:#fff}
-.nav-item.active{background:rgba(83,74,183,0.35);color:#fff;border-right:3px solid var(--purple)}
-.nav-item svg{width:16px;height:16px;flex-shrink:0;opacity:.8}
+/* LOGIN */
+#login-screen{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#1E1A4E 0%,#534AB7 100%);display:flex;align-items:center;justify-content:center}
+.login-box{background:#fff;border-radius:20px;padding:36px 32px;width:min(420px,94vw);box-shadow:0 24px 60px rgba(30,26,78,.35);animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.login-logo{width:54px;height:54px;background:var(--purple);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-family:'Montserrat',sans-serif;font-weight:900;font-size:18px;color:#fff}
+.login-box h2{font-family:'Montserrat',sans-serif;font-weight:900;font-size:20px;color:var(--purple-dark);text-align:center;margin-bottom:4px}
+.login-box .subtitle{font-size:12px;color:var(--muted);text-align:center;margin-bottom:24px}
+.lbl{font-size:12px;font-weight:600;color:#444;display:block;margin-bottom:5px}
+.linput{width:100%;padding:11px 13px;border:1.5px solid #ddd;border-radius:9px;font-size:13px;font-family:'DM Sans',sans-serif;margin-bottom:12px;transition:border .2s}
+.linput:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px rgba(83,74,183,.1)}
+.lerror{background:#FCEBEB;border:1px solid #f5c0c0;border-radius:8px;padding:8px 12px;font-size:12px;color:#8B1A1A;margin-bottom:12px;display:none}
+.lbtn{width:100%;padding:13px;background:var(--purple);color:#fff;border:none;border-radius:10px;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:background .2s}
+.lbtn:hover{background:var(--purple-dark)}
+.lfooter{text-align:center;margin-top:14px;font-size:11px;color:#aaa}
+
+/* LAYOUT */
+#app{display:none;min-height:100vh;display:none}
+.app-inner{display:flex;min-height:100vh}
+.sidebar{width:230px;flex-shrink:0;background:var(--sidebar);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;padding:20px 0;overflow-y:auto}
+.sb-brand{padding:0 18px 18px;border-bottom:1px solid rgba(255,255,255,0.07);margin-bottom:12px}
+.sb-logo{width:38px;height:38px;background:var(--purple);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Montserrat',sans-serif;font-weight:900;font-size:13px;margin-bottom:8px}
+.sb-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:13px;color:#fff;line-height:1.3}
+.sb-sub{font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px}
+.nav-label{font-size:9px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:rgba(255,255,255,.25);padding:8px 18px 3px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 18px;font-size:12px;color:rgba(255,255,255,0.58);cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif;border-right:3px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav-item.active{background:rgba(83,74,183,.32);color:#fff;border-right-color:var(--purple)}
+.nav-item svg{width:14px;height:14px;flex-shrink:0;opacity:.7}
 .nav-item.active svg{opacity:1}
-.sidebar-footer{margin-top:auto;padding:16px 20px;border-top:1px solid rgba(255,255,255,0.08)}
-.btn-logout{
-  display:flex;align-items:center;gap:8px;
-  width:100%;padding:8px 12px;background:rgba(255,255,255,0.07);
-  border:1px solid rgba(255,255,255,0.12);border-radius:8px;
-  color:rgba(255,255,255,0.6);font-size:12px;cursor:pointer;
-  font-family:'DM Sans',sans-serif;transition:all .2s;
-}
-.btn-logout:hover{background:rgba(163,45,45,0.3);color:#fff;border-color:rgba(163,45,45,0.5)}
-.btn-logout svg{width:14px;height:14px}
-
-/* ── MAIN ── */
-.main{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh}
-.topbar{
-  background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);
-  border-bottom:1px solid var(--border);padding:0 28px;
-  height:60px;display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:40;
-}
-.topbar-left h1{font-family:'Montserrat',sans-serif;font-weight:800;font-size:18px;color:var(--purple-dark)}
-.topbar-left p{font-size:12px;color:var(--muted)}
-.topbar-right{display:flex;align-items:center;gap:10px}
-.admin-pill{
-  display:flex;align-items:center;gap:6px;
-  background:var(--purple-light);color:var(--purple-dark);
-  padding:6px 12px;border-radius:99px;font-size:12px;font-weight:600;
-  font-family:'Montserrat',sans-serif;
-}
-.admin-pill svg{width:14px;height:14px}
-.btn-refresh{
-  padding:7px 12px;background:var(--purple);color:#fff;border:none;
-  border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;
-  font-family:'Montserrat',sans-serif;display:flex;align-items:center;gap:5px;transition:background .2s;
-}
+.nbadge{margin-left:auto;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;font-family:'Montserrat',sans-serif;min-width:18px;text-align:center}
+.sb-footer{margin-top:auto;padding:14px 18px;border-top:1px solid rgba(255,255,255,.07)}
+.btn-logout{display:flex;align-items:center;gap:7px;width:100%;padding:8px 11px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:rgba(255,255,255,.55);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-logout:hover{background:rgba(163,45,45,.3);color:#fff}
+.btn-logout svg{width:12px;height:12px}
+.main{margin-left:230px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 22px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
+.tb-left h1{font-family:'Montserrat',sans-serif;font-weight:800;font-size:16px;color:var(--purple-dark)}
+.tb-left p{font-size:10px;color:var(--muted);margin-top:1px}
+.tb-right{display:flex;align-items:center;gap:8px}
+.admin-chip{display:flex;align-items:center;gap:5px;background:var(--purple-light);color:var(--purple-dark);padding:5px 10px;border-radius:99px;font-size:11px;font-weight:600;font-family:'Montserrat',sans-serif}
+.btn-refresh{padding:6px 11px;background:var(--purple);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;display:flex;align-items:center;gap:4px;transition:background .2s}
 .btn-refresh:hover{background:var(--purple-dark)}
-.btn-refresh svg{width:13px;height:13px}
-
-.content{padding:24px 28px;flex:1}
-
-/* ── PAGES ── */
+.content{padding:18px 22px;flex:1}
 .page{display:none}.page.active{display:block}
 
-/* ── KPI CARDS ── */
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px}
-.kpi{
-  background:#fff;border-radius:14px;padding:18px;
-  border:1px solid var(--border);
-  position:relative;overflow:hidden;
-}
-.kpi::after{
-  content:'';position:absolute;top:0;right:0;width:70px;height:70px;
-  border-radius:0 14px 0 70px;
-  background:var(--kpi-color,var(--purple-light));opacity:.3;
-}
-.kpi-icon{font-size:22px;margin-bottom:8px}
-.kpi-val{font-family:'Montserrat',sans-serif;font-size:28px;font-weight:900;color:var(--kpi-color,var(--purple));line-height:1}
-.kpi-lbl{font-size:11px;color:var(--muted);margin-top:4px}
-.kpi-sub{font-size:10px;margin-top:3px;font-weight:600}
+/* KPIs */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:#fff;border-radius:12px;padding:14px;border:1px solid var(--border);transition:transform .15s,box-shadow .15s}
+.kpi:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(83,74,183,.1)}
+.kpi-icon{font-size:18px;margin-bottom:5px}
+.kpi-val{font-family:'Montserrat',sans-serif;font-size:24px;font-weight:900;line-height:1}
+.kpi-lbl{font-size:10px;color:var(--muted);margin-top:2px}
+.kpi-sub{font-size:10px;font-weight:600;margin-top:1px}
+.kpi.pulse{animation:blink 2s infinite}
+@keyframes blink{0%,100%{border-color:var(--border)}50%{border-color:rgba(163,45,45,.5)}}
 
-/* ALERT KPI */
-.kpi-alert{--kpi-color:#A32D2D;border:1.5px solid rgba(163,45,45,0.25);animation:pulse-border 2s infinite}
-@keyframes pulse-border{0%,100%{border-color:rgba(163,45,45,0.25)}50%{border-color:rgba(163,45,45,0.6)}}
-.kpi-alert .kpi-val{color:#A32D2D}
-.kpi-alert::after{background:#FCEBEB;opacity:.5}
+/* ALERT BANNER */
+.alert-banner{background:linear-gradient(135deg,#7a1c1c,#A32D2D);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:14px}
+.ab-txt h3{font-family:'Montserrat',sans-serif;font-weight:800;font-size:14px;color:#fff;margin-bottom:2px}
+.ab-txt p{font-size:11px;color:rgba(255,255,255,.7)}
+.ab-num{margin-left:auto;background:rgba(255,255,255,.15);padding:8px 14px;border-radius:8px;text-align:center;color:#fff;font-family:'Montserrat',sans-serif}
+.ab-num strong{display:block;font-size:26px;font-weight:900;line-height:1}
+.ab-num span{font-size:9px;opacity:.8;text-transform:uppercase}
 
-/* ── CHARTS ── */
-.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
-.chart-card{background:#fff;border-radius:14px;padding:20px;border:1px solid var(--border)}
+/* CHARTS */
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.chart-card{background:#fff;border-radius:12px;padding:16px;border:1px solid var(--border)}
 .chart-card.full{grid-column:1/-1}
-.chart-title{font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:var(--purple-dark);margin-bottom:4px}
-.chart-sub{font-size:11px;color:var(--muted);margin-bottom:14px}
-.chart-wrap{position:relative;height:220px}
+.cc-title{font-family:'Montserrat',sans-serif;font-weight:700;font-size:12px;color:var(--purple-dark);margin-bottom:1px}
+.cc-sub{font-size:10px;color:var(--muted);margin-bottom:10px}
+.chart-wrap{position:relative;height:190px}
+.chart-wrap.tall{height:230px}
 
-/* ── ALERT SECTION ── */
-.alert-header{
-  background:linear-gradient(135deg,#A32D2D,#7a1c1c);
-  border-radius:14px;padding:18px 22px;margin-bottom:18px;
-  display:flex;align-items:center;gap:16px;
-}
-.alert-icon{font-size:28px}
-.alert-header h2{font-family:'Montserrat',sans-serif;font-weight:800;font-size:16px;color:#fff;margin-bottom:2px}
-.alert-header p{font-size:12px;color:rgba(255,255,255,0.7)}
-.alert-count{
-  margin-left:auto;background:rgba(255,255,255,0.15);
-  padding:8px 16px;border-radius:8px;text-align:center;
-  color:#fff;font-family:'Montserrat',sans-serif;
-}
-.alert-count strong{display:block;font-size:26px;font-weight:900;line-height:1}
-.alert-count span{font-size:10px;opacity:.8}
+/* NIVELES CARDS */
+.niveles-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.nivel-card{background:#fff;border-radius:12px;padding:12px 8px;text-align:center;border:1px solid var(--border);cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.nivel-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--nc)}
+.nivel-card:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(83,74,183,.12)}
+.nivel-num{font-family:'Montserrat',sans-serif;font-size:22px;font-weight:900;color:var(--nc);line-height:1;margin:4px 0 2px}
+.nivel-lbl{font-size:9px;font-weight:700;color:var(--nc);font-family:'Montserrat',sans-serif;letter-spacing:.3px}
+.nivel-rng{font-size:9px;color:var(--muted);margin-top:2px}
 
-.promotor-list{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
-.promotor-row{
-  background:#fff;border-radius:12px;padding:14px 18px;
-  border:1px solid var(--border);
-  display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;
-}
-.promotor-row.critico{border-left:4px solid #A32D2D}
-.promotor-row.bajo{border-left:4px solid #C49A1A}
-.promotor-name{font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:2px}
-.promotor-meta{font-size:11px;color:var(--muted)}
-.promotor-scores{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
-.score-chip{
-  font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;
-  font-family:'Montserrat',sans-serif;
-}
-.score-chip.rojo{background:#FCEBEB;color:#A32D2D}
-.score-chip.naranja{background:#FAEEDA;color:#854F0B}
-.score-chip.ok{background:#E1F5EE;color:#0F6E56}
-.nivel-badge{
-  padding:5px 12px;border-radius:99px;font-size:11px;font-weight:700;
-  font-family:'Montserrat',sans-serif;text-align:center;
-}
-
-/* ── TABLE ── */
-.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
-table{width:100%;border-collapse:collapse;background:#fff;font-size:12px}
-th{background:#f8f7ff;color:var(--purple-dark);font-family:'Montserrat',sans-serif;font-weight:700;font-size:11px;padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)}
-td{padding:10px 12px;border-bottom:1px solid #f5f4fc;color:var(--text)}
+/* MODULE / TABLE */
+.mod-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.search-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.srch-wrap{position:relative;display:flex;align-items:center}
+.srch-wrap svg{position:absolute;left:9px;color:#aaa;width:13px;height:13px;pointer-events:none}
+.srch{padding:7px 9px 7px 30px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:'DM Sans',sans-serif;background:#fff;color:var(--text);width:210px;transition:border .2s}
+.srch:focus{outline:none;border-color:var(--purple)}
+.fsel{padding:7px 9px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;font-family:'DM Sans',sans-serif;background:#fff;color:var(--text)}
+.fsel:focus{outline:none;border-color:var(--purple)}
+.btn-exp{padding:6px 11px;background:var(--green);color:#fff;border:none;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;display:flex;align-items:center;gap:4px}
+.btn-exp:hover{background:#085041}
+.table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;background:#fff;font-size:11px}
+th{background:#f5f3ff;color:var(--purple-dark);font-family:'Montserrat',sans-serif;font-weight:700;font-size:10px;padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid #f5f3fe;vertical-align:middle}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:#fdfcff}
+tr:hover td{background:#fdfcff;cursor:pointer}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:9px;font-weight:700;font-family:'Montserrat',sans-serif;white-space:nowrap}
+.btn-ver{padding:3px 9px;border:1.5px solid var(--purple);color:var(--purple);background:transparent;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:'Montserrat',sans-serif;transition:all .15s;white-space:nowrap}
+.btn-ver:hover{background:var(--purple);color:#fff}
 
-.filter-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
-.filter-bar input,.filter-bar select{
-  padding:7px 11px;border:1.5px solid var(--border);border-radius:8px;
-  font-size:12px;font-family:'DM Sans',sans-serif;background:#fff;color:var(--text);
-}
-.filter-bar input:focus,.filter-bar select:focus{outline:none;border-color:var(--purple)}
-.filter-bar input{flex:1;min-width:200px}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(20,16,60,.45);backdrop-filter:blur(4px);align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:18px;width:min(600px,97vw);box-shadow:0 24px 60px rgba(20,16,60,.22);animation:fadeUp .2s ease;margin:auto}
+.mhero{border-radius:18px 18px 0 0;padding:20px 22px;position:relative;overflow:hidden}
+.mhero::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06)}
+.m-name{font-family:'Montserrat',sans-serif;font-weight:900;font-size:18px;color:#fff;margin-bottom:2px}
+.m-meta{font-size:11px;color:rgba(255,255,255,.6)}
+.m-score{font-family:'Montserrat',sans-serif;font-size:38px;font-weight:900;color:#fff;margin:6px 0 0;line-height:1}
+.m-score-sub{font-size:11px;color:rgba(255,255,255,.6);margin-bottom:6px}
+.m-close{position:absolute;top:13px;right:15px;background:rgba(255,255,255,.15);border:none;color:#fff;width:27px;height:27px;border-radius:50%;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.mbody{padding:18px 20px}
+.msec{font-family:'Montserrat',sans-serif;font-weight:700;font-size:10px;color:var(--purple-dark);letter-spacing:.8px;text-transform:uppercase;margin:14px 0 8px;padding-bottom:4px;border-bottom:1.5px solid var(--purple-light)}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.info-item{background:#f8f7ff;border-radius:8px;padding:8px 11px}
+.info-lbl{font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.info-val{font-size:12px;font-weight:700;color:var(--text);font-family:'Montserrat',sans-serif}
+.dim-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.dim-lbl{font-size:10px;color:#444;font-weight:500;width:170px;flex-shrink:0;line-height:1.3}
+.dim-bg{flex:1;height:7px;background:#f0effe;border-radius:99px;overflow:hidden}
+.dim-fill{height:100%;border-radius:99px;transition:width .6s ease}
+.dim-pct{font-size:10px;font-weight:700;min-width:28px;text-align:right;font-family:'Montserrat',sans-serif}
+.plan-box{border-radius:10px;padding:12px 14px;margin-top:2px}
+.plan-title{font-family:'Montserrat',sans-serif;font-weight:700;font-size:12px;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.plan-body{font-size:11px;line-height:1.75}
+.urgente-box{background:#FCEBEB;border:1.5px solid rgba(163,45,45,.2)}
+.urgente-box .plan-title{color:#A32D2D}
+.urgente-box .plan-body{color:#5a1a1a}
+.ok-box{background:#E1F5EE;border:1.5px solid rgba(15,110,86,.2)}
+.ok-box .plan-title{color:#0F6E56}
+.ok-box .plan-body{color:#0a3d2a}
+.star-box{background:#E6F0FB;border:1.5px solid rgba(18,85,161,.2)}
+.star-box .plan-title{color:#1255A1}
+.star-box .plan-body{color:#0a2d5a}
+.top-box{background:#EEEDFE;border:1.5px solid rgba(83,74,183,.2)}
+.top-box .plan-title{color:#534AB7}
+.top-box .plan-body{color:#26215C}
 
-/* ── LOADING ── */
-.loading-overlay{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:60px 20px;color:var(--muted);gap:12px;
-}
-.spinner{
-  width:36px;height:36px;border:3px solid var(--purple-light);
-  border-top-color:var(--purple);border-radius:50%;
-  animation:spin .7s linear infinite;
-}
+/* UTIL */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;gap:10px;color:var(--muted)}
+.spinner{width:30px;height:30px;border:3px solid var(--purple-light);border-top-color:var(--purple);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.empty-state{text-align:center;padding:50px 20px;color:var(--muted)}
-.empty-icon{font-size:36px;margin-bottom:10px}
-.empty-state p{font-size:13px}
-
-/* ── RESPONSIVE ── */
-@media(max-width:768px){
-  .sidebar{width:0;overflow:hidden}
-  .main{margin-left:0}
-  .charts-grid{grid-template-columns:1fr}
-}
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-icon{font-size:30px;margin-bottom:8px}
+.empty p{font-size:12px}
+.rec-count{font-size:10px;color:var(--muted);margin-top:6px;text-align:right}
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0}.charts-grid{grid-template-columns:1fr}.niveles-grid{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="sidebar-brand">
-    <div class="sidebar-logo">SB</div>
-    <div class="sidebar-title">Semillero<br>de Talentos</div>
-    <div class="sidebar-sub">Panel Administrador</div>
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">SB</div>
+    <h2>Panel RRHH</h2>
+    <p class="subtitle">Semillero de Talentos · Spectrum Brands · EFICACIA S.A.S.</p>
+    <div class="lerror" id="lerror">Usuario o contraseña incorrectos.</div>
+    <label class="lbl">Usuario</label>
+    <input class="linput" type="text" id="u-user" placeholder="Ingresa tu usuario" autocomplete="off">
+    <label class="lbl">Contraseña</label>
+    <input class="linput" type="password" id="u-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="lbtn" onclick="doLogin()">Ingresar al panel</button>
+    <div class="lfooter">Spectrum Brands · EFICACIA S.A.S. · 2026</div>
   </div>
+</div>
 
+<!-- APP -->
+<div id="app">
+<div class="app-inner">
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo">SB</div>
+    <div class="sb-title">Semillero<br>de Talentos</div>
+    <div class="sb-sub">Panel RRHH</div>
+  </div>
   <div class="nav-label">Principal</div>
-  <button class="nav-item active" onclick="showPage('resumen')">
+  <button class="nav-item active" onclick="showPage('resumen',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     Resumen General
   </button>
-  <button class="nav-item" onclick="showPage('alertas')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-    Plan de Intervención
+  <button class="nav-item" onclick="showPage('atencion',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Atención Inmediata
+    <span class="nbadge" id="nb-atencion" style="background:#A32D2D">0</span>
   </button>
-  <button class="nav-item" onclick="showPage('autoevaluaciones')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-    Autoevaluaciones
+  <div class="nav-label">Por Nivel</div>
+  <button class="nav-item" onclick="showPage('bajo',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Bajo Desempeño
+    <span class="nbadge" id="nb-bajo" style="background:#A32D2D">0</span>
   </button>
-  <button class="nav-item" onclick="showPage('etapa3')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-    Etapa 3 — Seguimiento
+  <button class="nav-item" onclick="showPage('bueno',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Buen Desempeño
+    <span class="nbadge" id="nb-bueno" style="background:#B8860B">0</span>
   </button>
-
-  <div class="sidebar-footer">
-    <button class="btn-logout" onclick="logout()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+  <button class="nav-item" onclick="showPage('sobresaliente',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    Sobresaliente
+    <span class="nbadge" id="nb-sobresaliente" style="background:#1255A1">0</span>
+  </button>
+  <button class="nav-item" onclick="showPage('destacado',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    Destacado
+    <span class="nbadge" id="nb-destacado" style="background:#0F6E56">0</span>
+  </button>
+  <button class="nav-item" onclick="showPage('sobrecumplimiento',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+    Sobrecumplimiento
+    <span class="nbadge" id="nb-sobre" style="background:#534AB7">0</span>
+  </button>
+  <div class="nav-label">Datos</div>
+  <button class="nav-item" onclick="showPage('todos',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    Todos los Colaboradores
+  </button>
+  <div class="sb-footer">
+    <div style="font-size:10px;color:rgba(255,255,255,.3);margin-bottom:8px" id="last-ts">Sin actualizar</div>
+    <button class="btn-logout" onclick="doLogout()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       Cerrar sesión
     </button>
   </div>
 </aside>
 
-<!-- MAIN -->
 <div class="main">
   <div class="topbar">
-    <div class="topbar-left">
+    <div class="tb-left">
       <h1 id="page-title">Resumen General</h1>
-      <p id="page-sub">Cargando datos desde Google Sheets...</p>
+      <p id="page-sub">Cargando datos...</p>
     </div>
-    <div class="topbar-right">
-      <div class="admin-pill">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-        <span id="admin-name">Administrador</span>
+    <div class="tb-right">
+      <div class="admin-chip">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <span id="chip-user">Admin</span>
       </div>
-      <button class="btn-refresh" onclick="loadAllData()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-5"/></svg>
+      <button class="btn-refresh" onclick="loadData()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 10.49-5"/></svg>
         Actualizar
       </button>
     </div>
   </div>
 
   <div class="content">
-
-    <!-- ═══════════════════ PAGE: RESUMEN ═══════════════════ -->
+    <!-- RESUMEN -->
     <div class="page active" id="page-resumen">
-      <!-- KPIs -->
-      <div class="kpi-grid" id="kpi-grid">
-        <div class="loading-overlay"><div class="spinner"></div><span style="font-size:12px">Cargando...</span></div>
+      <div class="kpi-grid" id="kpi-grid"><div class="loading"><div class="spinner"></div></div></div>
+      <div class="alert-banner" id="alert-banner" style="display:none">
+        <div style="font-size:26px">🚨</div>
+        <div class="ab-txt"><h3>Colaboradores — Atención inmediata RRHH</h3><p>Bajo Desempeño (&lt;60%) — Plan de mejora urgente requerido</p></div>
+        <div class="ab-num"><strong id="ab-n">0</strong><span>personas</span></div>
       </div>
-      <!-- Charts -->
-      <div class="charts-grid" id="charts-resumen">
-        <div class="chart-card">
-          <div class="chart-title">Distribución de Niveles</div>
-          <div class="chart-sub">Autoevaluaciones — todos los registros</div>
-          <div class="chart-wrap"><canvas id="chart-niveles"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Promedio por Regional</div>
-          <div class="chart-sub">Puntaje promedio general por zona</div>
-          <div class="chart-wrap"><canvas id="chart-regional"></canvas></div>
-        </div>
-        <div class="chart-card full">
-          <div class="chart-title">Comparativo Habilidades Blandas vs Duras</div>
-          <div class="chart-sub">Promedio por regional</div>
-          <div class="chart-wrap"><canvas id="chart-blandas-duras"></canvas></div>
-        </div>
+      <div class="charts-grid">
+        <div class="chart-card"><div class="cc-title">Distribución por Nivel de Desempeño</div><div class="cc-sub">Total colaboradores evaluados</div><div class="chart-wrap"><canvas id="c-donut"></canvas></div></div>
+        <div class="chart-card"><div class="cc-title">Promedio por Regional / Zona</div><div class="cc-sub">Puntaje promedio consolidado</div><div class="chart-wrap"><canvas id="c-reg"></canvas></div></div>
+        <div class="chart-card full"><div class="cc-title">Distribución de niveles por Regional</div><div class="cc-sub">Cantidad de personas por categoría en cada regional</div><div class="chart-wrap tall"><canvas id="c-stack"></canvas></div></div>
       </div>
+      <div class="niveles-grid" id="niveles-grid"></div>
     </div>
-
-    <!-- ═══════════════════ PAGE: ALERTAS ═══════════════════ -->
-    <div class="page" id="page-alertas">
-      <div class="alert-header">
-        <div class="alert-icon">🚨</div>
-        <div>
-          <h2>Promotores que requieren Plan de Intervención</h2>
-          <p>Colaboradores con rendimiento crítico (&lt;50%) o bajo (50–65%) que necesitan acompañamiento urgente</p>
-        </div>
-        <div class="alert-count">
-          <strong id="alert-total-count">—</strong>
-          <span>promotores</span>
-        </div>
+    <!-- ATENCION -->
+    <div class="page" id="page-atencion">
+      <div style="background:linear-gradient(135deg,#7a1c1c,#A32D2D);border-radius:12px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px">
+        <div style="font-size:24px">🚨</div>
+        <div><div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:14px;color:#fff;margin-bottom:2px">Atención Inmediata RRHH — Bajo Desempeño</div><div style="font-size:11px;color:rgba(255,255,255,.7)">Colaboradores con puntaje &lt;60% · Plan de mejora urgente · Busca por nombre o cédula</div></div>
+        <div style="margin-left:auto;background:rgba(255,255,255,.15);padding:7px 13px;border-radius:8px;text-align:center;color:#fff;font-family:'Montserrat',sans-serif"><strong style="display:block;font-size:24px;font-weight:900;line-height:1" id="n-atencion">0</strong><span style="font-size:9px;opacity:.8;text-transform:uppercase">personas</span></div>
       </div>
-      <div id="alertas-list">
-        <div class="loading-overlay"><div class="spinner"></div><span style="font-size:12px">Analizando datos...</span></div>
-      </div>
+      <div id="mod-atencion"><div class="loading"><div class="spinner"></div></div></div>
     </div>
+    <!-- BAJO -->
+    <div class="page" id="page-bajo"><div id="mod-bajo"><div class="loading"><div class="spinner"></div></div></div></div>
+    <!-- BUENO -->
+    <div class="page" id="page-bueno"><div id="mod-bueno"><div class="loading"><div class="spinner"></div></div></div></div>
+    <!-- SOBRESALIENTE -->
+    <div class="page" id="page-sobresaliente"><div id="mod-sobresaliente"><div class="loading"><div class="spinner"></div></div></div></div>
+    <!-- DESTACADO -->
+    <div class="page" id="page-destacado"><div id="mod-destacado"><div class="loading"><div class="spinner"></div></div></div></div>
+    <!-- SOBRECUMPLIMIENTO -->
+    <div class="page" id="page-sobrecumplimiento"><div id="mod-sobrecumplimiento"><div class="loading"><div class="spinner"></div></div></div></div>
+    <!-- TODOS -->
+    <div class="page" id="page-todos"><div id="mod-todos"><div class="loading"><div class="spinner"></div></div></div></div>
+  </div>
+</div>
+</div>
+</div>
 
-    <!-- ═══════════════════ PAGE: AUTOEVALUACIONES ═══════════════════ -->
-    <div class="page" id="page-autoevaluaciones">
-      <div class="filter-bar">
-        <input type="text" id="search-auto" placeholder="🔍 Buscar por nombre o cédula..." oninput="renderAutoTable()">
-        <select id="filter-regional" onchange="renderAutoTable()">
-          <option value="">Todas las regionales</option>
-          <option>Antioquia</option><option>Centro</option><option>Eje Cafetero</option>
-          <option>Norte</option><option>Occidente</option><option>Oriente</option>
-        </select>
-        <select id="filter-nivel" onchange="renderAutoTable()">
-          <option value="">Todos los niveles</option>
-          <option>Destacado</option><option>Competente</option><option>En proceso</option><option>En desarrollo</option>
-        </select>
-        <button style="padding:7px 12px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-family:'Montserrat',sans-serif;font-weight:600" onclick="exportCSV('auto')">⬇ CSV</button>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Nombre</th><th>Cédula</th><th>Regional</th><th>Cadena</th>
-              <th>Blandas</th><th>Duras</th><th>Total</th><th>Nivel</th><th>Fecha</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-auto"></tbody>
-        </table>
-      </div>
+<!-- MODAL PERFIL -->
+<div class="modal-overlay" id="modal-perfil" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="mhero" id="m-hero" style="background:linear-gradient(135deg,#534AB7,#3C3489)">
+      <button class="m-close" onclick="closeModal()">✕</button>
+      <div class="m-name" id="m-name">—</div>
+      <div class="m-meta" id="m-meta">—</div>
+      <div class="m-score" id="m-score">—</div>
+      <div class="m-score-sub" id="m-score-sub">—</div>
+      <div id="m-badge" style="margin-top:6px"></div>
     </div>
-
-    <!-- ═══════════════════ PAGE: ETAPA 3 ═══════════════════ -->
-    <div class="page" id="page-etapa3">
-      <div class="filter-bar">
-        <input type="text" id="search-etapa3" placeholder="🔍 Buscar por nombre o cédula..." oninput="renderEtapa3Table()">
-        <select id="filter-zona" onchange="renderEtapa3Table()">
-          <option value="">Todas las zonas</option>
-          <option>CENTRO</option><option>NORTE</option><option>ANTIOQUIA</option><option>OCCIDENTE</option>
-        </select>
-        <button style="padding:7px 12px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-family:'Montserrat',sans-serif;font-weight:600" onclick="exportCSV('etapa3')">⬇ CSV</button>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Nombre</th><th>Cédula</th><th>Cliente</th><th>Zona</th><th>Cupo</th>
-              <th>Puntaje</th><th>%</th><th>Nivel</th><th>Fecha</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-etapa3"></tbody>
-        </table>
-      </div>
+    <div class="mbody">
+      <div class="msec">Información del colaborador</div>
+      <div class="info-grid" id="m-info"></div>
+      <div class="msec">Perfil de desempeño</div>
+      <div id="m-dims"></div>
+      <div class="msec">Diagnóstico y plan de acción</div>
+      <div id="m-plan"></div>
     </div>
-
-  </div><!-- /content -->
-</div><!-- /main -->
+  </div>
+</div>
 
 <script>
-/* ══════════════════════════════════════════════════
-   CONFIG
-══════════════════════════════════════════════════ */
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzv9MvljOIlcw-_ujQQPDp7QrjQetHOwN-bOyXmsSxwYEc3iinCUJHA2KL0LfPAIXwD/exec';
+/* ════ CONFIG ════ */
+const SHEET_URL='https://script.google.com/macros/s/AKfycbwTbCSTY5_tygie8An40f8V-1k2lzik6buRNnF-KdcJTb5bBt8E6iWmFOL-CP28IzC_6Q/exec';
 
-// Auth check
-if(!sessionStorage.getItem('sb_admin')){
-  window.location.href = 'semillero_talentos.html';
-}
-document.getElementById('admin-name').textContent = sessionStorage.getItem('sb_admin_user') || 'Admin';
+const ADMINS={admin:'semillero2026',rrhh:'rrhh2026',coordinador:'coord2026'};
 
-function logout(){
-  sessionStorage.removeItem('sb_admin');
-  sessionStorage.removeItem('sb_admin_user');
-  window.location.href = 'semillero_talentos.html';
-}
+/* PARAMETRIZACIÓN OFICIAL */
+const NIVELES=[
+  {key:'bajo',           label:'Bajo Desempeño',     min:0,   max:59.99, color:'#A32D2D', bg:'#FCEBEB', icon:'⚠',  urgente:true},
+  {key:'bueno',          label:'Buen Desempeño',      min:60,  max:79.99, color:'#B8860B', bg:'#FEF8E6', icon:'📈', urgente:false},
+  {key:'sobresaliente',  label:'Sobresaliente',       min:80,  max:94.99, color:'#1255A1', bg:'#E6F0FB', icon:'⭐', urgente:false},
+  {key:'destacado',      label:'Destacado',           min:95,  max:99.99, color:'#0F6E56', bg:'#E1F5EE', icon:'🏆', urgente:false},
+  {key:'sobrecumplimiento',label:'Sobrecumplimiento', min:100, max:9999,  color:'#534AB7', bg:'#EEEDFE', icon:'🚀', urgente:false}
+];
+function getNivel(pct){return NIVELES.find(n=>pct>=n.min&&pct<=n.max)||NIVELES[0];}
 
-/* ══════════════════════════════════════════════════
-   STATE
-══════════════════════════════════════════════════ */
-let dataAuto = [];
-let dataEtapa3 = [];
-let chartsBuilt = false;
-let chartInstances = {};
-
-/* ══════════════════════════════════════════════════
-   NAVIGATION
-══════════════════════════════════════════════════ */
-const pageTitles = {
-  resumen:         ['Resumen General',             'Vista consolidada de todas las evaluaciones'],
-  alertas:         ['Plan de Intervención',         'Promotores con rendimiento crítico o bajo'],
-  autoevaluaciones:['Autoevaluaciones',             'Registros de autoevaluación de competencias'],
-  etapa3:          ['Etapa 3 — Seguimiento',        'Registros de seguimiento etapa productiva'],
+const PAGE_TITLES={
+  resumen:          ['Resumen General','Vista consolidada de todos los colaboradores'],
+  atencion:         ['⚠ Atención Inmediata RRHH','Colaboradores Bajo Desempeño — Intervención urgente requerida'],
+  bajo:             ['Bajo Desempeño  < 60%','Requieren plan de mejora — RRHH debe abordarlos'],
+  bueno:            ['Buen Desempeño  60% – 80%','Desempeño aceptable con oportunidades de mejora'],
+  sobresaliente:    ['Sobresaliente  80% – 95%','Por encima de lo esperado'],
+  destacado:        ['Destacado  95% – 100%','Excelencia sostenida'],
+  sobrecumplimiento:['Sobrecumplimiento  > 100%','Superan todos los indicadores'],
+  todos:            ['Todos los Colaboradores','Registro completo · Busca por CC o nombre'],
 };
-function showPage(id){
+
+/* ════ AUTH ════ */
+function doLogin(){
+  const u=document.getElementById('u-user').value.trim().toLowerCase();
+  const p=document.getElementById('u-pass').value;
+  const err=document.getElementById('lerror');
+  if(ADMINS[u]&&ADMINS[u]===p){
+    err.style.display='none';
+    sessionStorage.setItem('sb_ok','1');
+    sessionStorage.setItem('sb_usr',u);
+    bootApp();
+  } else {
+    err.style.display='block';
+    document.getElementById('u-pass').value='';
+  }
+}
+function doLogout(){sessionStorage.clear();location.reload();}
+function bootApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  const u=sessionStorage.getItem('sb_usr')||'admin';
+  document.getElementById('chip-user').textContent=u.charAt(0).toUpperCase()+u.slice(1);
+  loadData();
+}
+if(sessionStorage.getItem('sb_ok')) bootApp();
+
+/* ════ NAVIGATION ════ */
+function showPage(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n=>{ if(n.getAttribute('onclick')?.includes(id)) n.classList.add('active'); });
-  document.getElementById('page-title').textContent = pageTitles[id][0];
-  document.getElementById('page-sub').textContent = pageTitles[id][1];
+  if(btn) btn.classList.add('active');
+  document.getElementById('page-title').textContent=PAGE_TITLES[id][0];
+  document.getElementById('page-sub').textContent=PAGE_TITLES[id][1];
 }
 
-/* ══════════════════════════════════════════════════
-   LOAD DATA
-══════════════════════════════════════════════════ */
-async function loadAllData(){
-  document.getElementById('page-sub').textContent = 'Actualizando datos...';
-  try {
-    const res = await fetch(SHEET_URL + '?action=getAll', {mode:'cors'});
-    const json = await res.json();
-    processData(json);
+/* ════ DATA ════ */
+let allData=[];
+let chartInst={};
+let modData={};
+
+async function loadData(){
+  document.getElementById('page-sub').textContent='Actualizando...';
+  try{
+    const res=await fetch(SHEET_URL+'?action=getAll&t='+Date.now());
+    const json=await res.json();
+    allData=parseSheets(json);
   } catch(e){
-    // Fallback: use demo data for development/preview
-    console.warn('No se pudo conectar a Sheets, usando datos demo:', e);
-    processData(getDemoData());
+    console.warn('Demo mode:',e.message);
+    allData=makeDemo();
   }
-  document.getElementById('page-sub').textContent = 'Última actualización: '+new Date().toLocaleString('es-CO',{timeZone:'America/Bogota'});
+  const ts=new Date().toLocaleString('es-CO',{timeZone:'America/Bogota',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('last-ts').textContent='Act. '+ts;
+  document.getElementById('page-sub').textContent=PAGE_TITLES['resumen'][1];
+  buildAll();
 }
 
-function processData(json){
-  // Parse autoevaluaciones
-  if(json.autoevaluacion && Array.isArray(json.autoevaluacion)){
-    dataAuto = json.autoevaluacion.map(r => ({
-      fecha:    r[0]||'',
-      nombre:   r[1]||'',
-      regional: r[3]||'',
-      pdv:      r[4]||'',
-      cadena:   r[5]||'',
-      fechaEv:  r[6]||'',
-      pctB:     parseFloat(r[7])||0,
-      pctD:     parseFloat(r[8])||0,
-      pctTotal: parseFloat(r[9])||0,
-      perfil:   r[10]||'',
-      cedula:   r[13]||'',
-    }));
-  }
-
-  // Parse etapa3
-  if(json.etapa3_seguimiento && Array.isArray(json.etapa3_seguimiento)){
-    dataEtapa3 = json.etapa3_seguimiento.map(r => ({
-      fecha:   r[0]||'',
-      nombre:  r[1]||'',
-      cedula:  r[2]||'',
-      cliente: r[3]||'',
-      cupo:    r[4]||'',
-      zona:    r[5]||'',
-      pts:     parseFloat(r[6])||0,
-      pct:     parseFloat(r[7])||0,
-      nivel:   r[8]||'',
-      items:   r[9]||'',
-    }));
-  }
-
-  buildDashboard();
-}
-
-/* ══════════════════════════════════════════════════
-   DEMO DATA (when Sheets is unavailable)
-══════════════════════════════════════════════════ */
-function getDemoData(){
-  const perfiles = ['En desarrollo','En desarrollo','En proceso','En proceso','Competente','Competente','Competente','Destacado'];
-  const regionales = ['Antioquia','Centro','Eje Cafetero','Norte','Occidente','Oriente'];
-  const nombres = ['Carlos Ruiz','María López','Juan García','Ana Torres','Pedro Díaz','Laura Gómez','Sergio Martín','Valentina Ríos','Felipe Castro','Diana Mora','Andrés Pinto','Camila Vera','Oscar Reyes','Natalia Cruz'];
-  const auto = nombres.map((n,i) => {
-    const pctB = 30+Math.floor(Math.random()*60);
-    const pctD = 30+Math.floor(Math.random()*60);
-    const tot = Math.round((pctB+pctD)/2);
-    const perfil = tot<50?'En desarrollo':tot<66?'En proceso':tot<80?'Competente':'Destacado';
-    return { fecha:'2026-04-'+String((i%28)+1).padStart(2,'0'), nombre:n, regional:regionales[i%6], pdv:'Tienda '+i, cadena:'ALMACENES ÉXITO S.A', fechaEv:'2026-04-01', pctB, pctD, pctTotal:tot, perfil, cedula:'100000'+i };
+function parseSheets(json){
+  const out=[];
+  if(json.autoevaluacion) json.autoevaluacion.forEach(r=>{
+    const pct=parseFloat(r[9])||0;
+    out.push({tipo:'Autoevaluación',fecha:r[0]||'',nombre:r[1]||'',regional:r[3]||'',pdv:r[4]||'',cadena:r[5]||'',cedula:r[13]||'',pct,pctB:parseFloat(r[7])||0,pctD:parseFloat(r[8])||0,cupo:'',zona:r[3]||'',cliente:'',dims:[]});
   });
-  const etapa3 = nombres.slice(0,8).map((n,i) => {
-    const pts = 18+Math.floor(Math.random()*36);
-    const pct = Math.round((pts/54)*100);
-    const nivel = pct<62?'Nivel Bajo':pct<85?'Nivel Medio':'Nivel Alto';
-    return { fecha:'2026-04-'+String((i%28)+1).padStart(2,'0'), nombre:n, cedula:'100000'+i, cliente:'SPECTRUM BRANDS CORP SAS', cupo:'FIJO', zona:['CENTRO','NORTE','ANTIOQUIA','OCCIDENTE'][i%4], pts, pct, nivel, items:18 };
+  if(json.etapa3_seguimiento) json.etapa3_seguimiento.forEach(r=>{
+    const pct=parseFloat(String(r[7]).replace('%',''))||0;
+    out.push({tipo:'Etapa 3',fecha:r[0]||'',nombre:r[1]||'',cedula:r[2]||'',cliente:r[3]||'',cupo:r[4]||'',zona:r[5]||'',pts:parseFloat(r[6])||0,pct,regional:r[5]||'',cadena:'',pdv:'',pctB:0,pctD:0,dims:r.slice(10).map(v=>parseFloat(v)||0)});
   });
-  return { autoevaluacion: auto.map(r=>[r.fecha,r.nombre,'',r.regional,r.pdv,r.cadena,r.fechaEv,r.pctB,r.pctD,r.pctTotal,r.perfil,'','',r.cedula]), etapa3_seguimiento: etapa3.map(r=>[r.fecha,r.nombre,r.cedula,r.cliente,r.cupo,r.zona,r.pts,r.pct,r.nivel,r.items]) };
+  return out;
 }
 
-/* ══════════════════════════════════════════════════
-   BUILD DASHBOARD
-══════════════════════════════════════════════════ */
-function buildDashboard(){
-  buildKPIs();
-  buildCharts();
-  buildAlertas();
-  renderAutoTable();
-  renderEtapa3Table();
+function makeDemo(){
+  const ns=['Carlos Ruiz','María López','Juan García','Ana Torres','Pedro Díaz','Laura Gómez','Sergio Martín','Valentina Ríos','Felipe Castro','Diana Mora','Andrés Pinto','Camila Vera','Óscar Reyes','Natalia Cruz','Julián Vargas','Sofía Herrera','Manuela Parra','Daniel Muñoz','Isabella Soto','Santiago Cárdenas'];
+  const zs=['Antioquia','Centro','Eje Cafetero','Norte','Occidente'];
+  const ps=[22,35,42,48,55,61,65,68,72,75,78,82,85,88,90,94,97,99,102,108];
+  return ns.map((n,i)=>({tipo:i%2===0?'Autoevaluación':'Etapa 3',nombre:n,cedula:'10000'+String(i+1).padStart(4,'0'),regional:zs[i%5],zona:zs[i%5],cliente:'SPECTRUM BRANDS CORP SAS',cupo:['FIJO','ADICIONAL','PROYECTO','SENA'][i%4],pdv:'PDV '+i,cadena:'ALMACENES ÉXITO S.A',fecha:new Date(2026,3,i+1).toLocaleDateString('es-CO'),pct:ps[i]||50,pctB:Math.round((ps[i]||50)*0.9+5),pctD:Math.round((ps[i]||50)*0.85+5),pts:Math.round((ps[i]||50)/100*54),dims:[2,2,1,3,2,1]}));
 }
 
-/* ── KPIs ── */
+/* ════ BUILD ALL ════ */
+function buildAll(){
+  buildKPIs(); buildCharts(); buildNiveles(); updateBadges();
+  buildModuleAtencion();
+  NIVELES.forEach(n=>buildModule(n.key));
+  buildModule('todos');
+}
+
+/* KPIs */
 function buildKPIs(){
-  const total = dataAuto.length;
-  const destacados = dataAuto.filter(r=>r.perfil==='Destacado').length;
-  const competentes = dataAuto.filter(r=>r.perfil==='Competente').length;
-  const criticos = dataAuto.filter(r=>r.pctTotal<50).length;
-  const bajos = dataAuto.filter(r=>r.pctTotal>=50&&r.pctTotal<66).length;
-  const intervencion = criticos + bajos;
-  const promedio = total ? Math.round(dataAuto.reduce((a,r)=>a+r.pctTotal,0)/total) : 0;
-  const etapa3Total = dataEtapa3.length;
-
-  const kpis = [
-    {icon:'👥',val:total,lbl:'Promotores evaluados',sub:'Autoevaluaciones',color:'var(--purple)',bg:'var(--purple-light)',extra:''},
-    {icon:'⭐',val:destacados+competentes,lbl:'Nivel Competente o superior',sub:destacados+' Destacados · '+competentes+' Competentes',color:'var(--green)',bg:'var(--green-light)',extra:''},
-    {icon:'📊',val:promedio+'%',lbl:'Promedio general',sub:'Todas las regionales',color:'var(--teal)',bg:'var(--teal-light)',extra:''},
-    {icon:'📋',val:etapa3Total,lbl:'Seguimientos Etapa 3',sub:'Registros completados',color:'var(--gold)',bg:'var(--gold-light)',extra:''},
-    {icon:'🚨',val:intervencion,lbl:'Requieren intervención',sub:criticos+' críticos (<50%) · '+bajos+' bajos (50–65%)',color:'var(--red)',bg:'var(--red-light)',extra:'alert',isAlert:true},
+  const tot=allData.length;
+  const bajos=allData.filter(r=>r.pct<60);
+  const prom=tot?Math.round(allData.reduce((a,r)=>a+r.pct,0)/tot):0;
+  const nv=getNivel(prom);
+  const kpis=[
+    {icon:'👥',val:tot,lbl:'Total colaboradores',sub:'evaluaciones registradas',c:'#534AB7'},
+    {icon:'🚨',val:bajos.length,lbl:'Atención inmediata',sub:'Bajo Desempeño <60%',c:'#A32D2D',pulse:true},
+    {icon:'📊',val:prom+'%',lbl:'Promedio general',sub:'Nivel: '+nv.label,c:nv.color},
+    {icon:'📋',val:allData.filter(r=>r.tipo==='Autoevaluación').length,lbl:'Autoevaluaciones',sub:'registros',c:'#1255A1'},
+    {icon:'✅',val:allData.filter(r=>r.tipo==='Etapa 3').length,lbl:'Seguimientos Etapa 3',sub:'registros',c:'#0F6E56'},
   ];
-
-  const grid = document.getElementById('kpi-grid');
-  grid.innerHTML = kpis.map(k=>`
-    <div class="kpi ${k.isAlert?'kpi-alert':''}" style="--kpi-color:${k.color}">
+  document.getElementById('kpi-grid').innerHTML=kpis.map(k=>`
+    <div class="kpi${k.pulse?' pulse':''}" style="border-top:3px solid ${k.c}">
       <div class="kpi-icon">${k.icon}</div>
-      <div class="kpi-val">${k.val}</div>
+      <div class="kpi-val" style="color:${k.c}">${k.val}</div>
       <div class="kpi-lbl">${k.lbl}</div>
-      <div class="kpi-sub" style="color:${k.color}">${k.sub}</div>
+      <div class="kpi-sub" style="color:${k.c}">${k.sub}</div>
     </div>`).join('');
+  const ab=document.getElementById('alert-banner');
+  document.getElementById('ab-n').textContent=bajos.length;
+  ab.style.display=bajos.length>0?'flex':'none';
 }
 
-/* ── CHARTS ── */
+/* CHARTS */
 function buildCharts(){
-  // Destroy previous if exist
-  Object.values(chartInstances).forEach(c=>c&&c.destroy&&c.destroy());
-  chartInstances = {};
-
-  // 1. Distribución niveles
-  const nivCount = {Destacado:0,Competente:0,'En proceso':0,'En desarrollo':0};
-  dataAuto.forEach(r=>{ if(nivCount[r.perfil]!==undefined) nivCount[r.perfil]++; });
-  chartInstances.niveles = new Chart(document.getElementById('chart-niveles'), {
-    type:'doughnut',
-    data:{
-      labels:Object.keys(nivCount),
-      datasets:[{data:Object.values(nivCount),backgroundColor:['#0F6E56','#185FA5','#854F0B','#A32D2D'],borderWidth:0,hoverOffset:6}]
-    },
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11,family:'Montserrat'},padding:12}}}}
+  Object.values(chartInst).forEach(c=>c&&c.destroy&&c.destroy());
+  chartInst={};
+  const counts=NIVELES.map(n=>allData.filter(r=>getNivel(r.pct).key===n.key).length);
+  chartInst.donut=new Chart(document.getElementById('c-donut'),{type:'doughnut',
+    data:{labels:NIVELES.map(n=>n.label),datasets:[{data:counts,backgroundColor:NIVELES.map(n=>n.color),borderWidth:0,hoverOffset:5}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom',labels:{font:{size:9,family:'Montserrat'},padding:8,boxWidth:10}}}}
   });
-
-  // 2. Promedio por regional
-  const regionals = ['Antioquia','Centro','Eje Cafetero','Norte','Occidente','Oriente'];
-  const regAvg = regionals.map(reg=>{
-    const items = dataAuto.filter(r=>r.regional===reg);
-    return items.length ? Math.round(items.reduce((a,r)=>a+r.pctTotal,0)/items.length) : 0;
+  const regs=[...new Set(allData.map(r=>r.regional||r.zona).filter(Boolean))];
+  const regAvg=regs.map(reg=>{const it=allData.filter(r=>(r.regional||r.zona)===reg);return it.length?Math.round(it.reduce((a,r)=>a+r.pct,0)/it.length):0;});
+  chartInst.reg=new Chart(document.getElementById('c-reg'),{type:'bar',
+    data:{labels:regs,datasets:[{data:regAvg,backgroundColor:regAvg.map(v=>getNivel(v).color+'BB'),borderRadius:5,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:120,ticks:{font:{size:9}},grid:{color:'#f0effe'}},x:{ticks:{font:{size:9,family:'Montserrat',weight:'600'}}}}}
   });
-  chartInstances.regional = new Chart(document.getElementById('chart-regional'), {
-    type:'bar',
-    data:{
-      labels:regionals.map(r=>r.length>10?r.slice(0,10)+'…':r),
-      datasets:[{label:'Promedio %',data:regAvg,backgroundColor:'#534AB7',borderRadius:6,borderSkipped:false}]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false}},
-      scales:{y:{min:0,max:100,ticks:{font:{size:10}},grid:{color:'#f0effe'}},x:{ticks:{font:{size:10}}}}
-    }
-  });
-
-  // 3. Blandas vs Duras por regional
-  const regB = regionals.map(reg=>{ const items=dataAuto.filter(r=>r.regional===reg); return items.length?Math.round(items.reduce((a,r)=>a+r.pctB,0)/items.length):0; });
-  const regD = regionals.map(reg=>{ const items=dataAuto.filter(r=>r.regional===reg); return items.length?Math.round(items.reduce((a,r)=>a+r.pctD,0)/items.length):0; });
-  chartInstances.bld = new Chart(document.getElementById('chart-blandas-duras'), {
-    type:'bar',
-    data:{
-      labels:regionals,
-      datasets:[
-        {label:'Habilidades Blandas',data:regB,backgroundColor:'#534AB7',borderRadius:4},
-        {label:'Habilidades Duras',data:regD,backgroundColor:'#0F6E56',borderRadius:4}
-      ]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{font:{size:11,family:'Montserrat'},padding:14}}},
-      scales:{y:{min:0,max:100,ticks:{font:{size:10}},grid:{color:'#f0effe'}},x:{ticks:{font:{size:10}}}}
-    }
+  const dsets=NIVELES.map(n=>({label:n.label,data:regs.map(reg=>allData.filter(r=>(r.regional||r.zona)===reg&&getNivel(r.pct).key===n.key).length),backgroundColor:n.color,borderRadius:3,borderSkipped:false}));
+  chartInst.stack=new Chart(document.getElementById('c-stack'),{type:'bar',
+    data:{labels:regs,datasets:dsets},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:9,family:'Montserrat'},padding:8,boxWidth:10}}},scales:{x:{stacked:true,ticks:{font:{size:9,family:'Montserrat',weight:'600'}}},y:{stacked:true,ticks:{font:{size:9}},grid:{color:'#f0effe'}}}}
   });
 }
 
-/* ── ALERTAS ── */
-function buildAlertas(){
-  const criticos = dataAuto.filter(r=>r.pctTotal<50).sort((a,b)=>a.pctTotal-b.pctTotal);
-  const bajos    = dataAuto.filter(r=>r.pctTotal>=50&&r.pctTotal<66).sort((a,b)=>a.pctTotal-b.pctTotal);
-  const all = [...criticos,...bajos];
-
-  document.getElementById('alert-total-count').textContent = all.length;
-
-  if(!all.length){
-    document.getElementById('alertas-list').innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">✅</div>
-        <p>No hay promotores en estado crítico o bajo en este momento.</p>
-      </div>`;
-    return;
-  }
-
-  const html = all.map(r => {
-    const isCrit = r.pctTotal < 50;
-    const nivelColor = isCrit ? '#A32D2D' : '#854F0B';
-    const nivelBg = isCrit ? '#FCEBEB' : '#FAEEDA';
-    const nivelLabel = isCrit ? '🔴 Crítico' : '🟠 Bajo';
-    return `
-      <div class="promotor-row ${isCrit?'critico':'bajo'}">
-        <div>
-          <div class="promotor-name">${esc(r.nombre)||'Sin nombre'}</div>
-          <div class="promotor-meta">📍 ${esc(r.regional)} · 🏬 ${esc(r.cadena||r.pdv)} · 🗓 ${esc(r.fechaEv)}</div>
-          <div class="promotor-scores">
-            <span class="score-chip ${r.pctB<50?'rojo':'naranja'}">Blandas: ${r.pctB}%</span>
-            <span class="score-chip ${r.pctD<50?'rojo':'naranja'}">Duras: ${r.pctD}%</span>
-            <span class="score-chip ${r.pctTotal<50?'rojo':r.pctTotal<66?'naranja':'ok'}">Total: ${r.pctTotal}%</span>
-          </div>
-        </div>
-        <div class="nivel-badge" style="background:${nivelBg};color:${nivelColor}">${nivelLabel}</div>
-      </div>`;
+/* NIVELES GRID */
+function buildNiveles(){
+  document.getElementById('niveles-grid').innerHTML=NIVELES.map(n=>{
+    const cnt=allData.filter(r=>getNivel(r.pct).key===n.key).length;
+    return `<div class="nivel-card" style="--nc:${n.color}" onclick="showPage('${n.key}',null)">
+      <div style="font-size:18px">${n.icon}</div>
+      <div class="nivel-num">${cnt}</div>
+      <div class="nivel-lbl">${n.label}</div>
+      <div class="nivel-rng">${n.min}%${n.max>=9999?'+':'–'+Math.floor(n.max)+'%'}</div>
+    </div>`;
   }).join('');
+}
 
-  const rec = `
-    <div style="background:#fff;border-radius:12px;padding:16px 20px;border:1px solid var(--border);margin-top:14px">
-      <div style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:var(--purple-dark);margin-bottom:10px">📌 Acciones recomendadas</div>
-      <div style="font-size:12px;color:var(--muted);line-height:1.8">
-        • <strong>Reunión de seguimiento</strong> individual con cada promotor en estado crítico.<br>
-        • <strong>Asignar tutor o acompañante</strong> de la regional con mayor puntaje.<br>
-        • <strong>Plan de formación</strong> de 30 días enfocado en las competencias con menor puntaje.<br>
-        • <strong>Re-evaluación</strong> al final del plan para medir avance.
+/* BADGES */
+function updateBadges(){
+  const map={bajo:'nb-bajo',bueno:'nb-bueno',sobresaliente:'nb-sobresaliente',destacado:'nb-destacado',sobrecumplimiento:'nb-sobre'};
+  const bajos=allData.filter(r=>r.pct<60).length;
+  document.getElementById('nb-atencion').textContent=bajos;
+  document.getElementById('n-atencion').textContent=bajos;
+  NIVELES.forEach(n=>{
+    const el=document.getElementById(map[n.key]);
+    if(el) el.textContent=allData.filter(r=>getNivel(r.pct).key===n.key).length;
+  });
+}
+
+/* MODULO ATENCIÓN */
+function buildModuleAtencion(){
+  const data=allData.filter(r=>r.pct<60).sort((a,b)=>a.pct-b.pct);
+  document.getElementById('n-atencion').textContent=data.length;
+  const el=document.getElementById('mod-atencion');
+  if(!data.length){el.innerHTML=`<div class="empty"><div class="empty-icon">✅</div><p>No hay colaboradores en Bajo Desempeño.</p></div>`;return;}
+  el.innerHTML=renderModule('atencion',data);
+  initModule('atencion',data);
+}
+
+/* MÓDULOS POR NIVEL */
+function buildModule(key){
+  const data=key==='todos'?[...allData].sort((a,b)=>a.pct-b.pct):allData.filter(r=>getNivel(r.pct).key===key).sort((a,b)=>a.pct-b.pct);
+  const el=document.getElementById('mod-'+key);
+  if(!data.length){el.innerHTML=`<div class="empty"><div class="empty-icon">📭</div><p>No hay colaboradores en esta categoría.</p></div>`;return;}
+  el.innerHTML=renderModule(key,data);
+  initModule(key,data);
+}
+
+/* RENDER TABLA */
+function renderModule(key,data){
+  const urgBanner=key==='bajo'||key==='atencion'?`<div style="background:#FCEBEB;border:1px solid rgba(163,45,45,.2);border-radius:8px;padding:10px 13px;margin-bottom:11px;font-size:11px;color:#7a1c1c"><strong>⚠ Acción requerida:</strong> Contactar a cada colaborador e iniciar plan de mejora. Haz clic en "Ver perfil" para el diagnóstico individual.</div>`:'';
+  const regs=[...new Set(data.map(r=>r.regional||r.zona).filter(Boolean))];
+  return `${urgBanner}
+  <div class="mod-header">
+    <div class="search-bar">
+      <div class="srch-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="srch" type="text" placeholder="Buscar por CC o nombre..." id="s-${key}" oninput="filterMod('${key}')">
+      </div>
+      <select class="fsel" id="r-${key}" onchange="filterMod('${key}')">
+        <option value="">Todas las regionales</option>
+        ${regs.map(r=>`<option>${r}</option>`).join('')}
+      </select>
+      <select class="fsel" id="t-${key}" onchange="filterMod('${key}')">
+        <option value="">Todos los tipos</option>
+        <option>Autoevaluación</option><option>Etapa 3</option>
+      </select>
+      <select class="fsel" id="q-${key}" onchange="filterMod('${key}')">
+        <option value="">Todos los cupos</option>
+        <option>FIJO</option><option>ADICIONAL</option><option>PROYECTO</option><option>SENA</option><option>EMBARAZADA</option>
+      </select>
+      <button class="btn-exp" onclick="exportCSV('${key}')">⬇ CSV</button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>Nombre</th><th>CC / Cédula</th><th>Tipo</th><th>Regional / Zona</th>
+        <th>Puntaje</th><th>Nivel</th><th>Cupo / Tipo</th><th>Cliente / Cadena</th><th>Fecha</th><th></th>
+      </tr></thead>
+      <tbody id="tb-${key}"></tbody>
+    </table>
+  </div>
+  <div class="rec-count" id="rc-${key}"></div>`;
+}
+
+function initModule(key,data){
+  modData[key]=data;
+  renderTable(key,data);
+}
+
+function filterMod(key){
+  const s=(document.getElementById('s-'+key)?.value||'').toLowerCase();
+  const r=document.getElementById('r-'+key)?.value||'';
+  const t=document.getElementById('t-'+key)?.value||'';
+  const q=document.getElementById('q-'+key)?.value||'';
+  const base=modData[key]||[];
+  const filtered=base.filter(row=>{
+    const txt=(row.nombre+row.cedula).toLowerCase();
+    return txt.includes(s)&&(!r||(row.regional||row.zona)===r)&&(!t||row.tipo===t)&&(!q||row.cupo===q);
+  });
+  renderTable(key,filtered,true);
+}
+
+function renderTable(key,data,filtered=false){
+  if(!filtered) modData[key]=data;
+  const tbody=document.getElementById('tb-'+key);
+  const rc=document.getElementById('rc-'+key);
+  if(!tbody) return;
+  if(!data.length){tbody.innerHTML=`<tr><td colspan="10" style="text-align:center;color:#aaa;padding:20px">Sin resultados</td></tr>`;if(rc)rc.textContent='';return;}
+  if(rc) rc.textContent=data.length+' registro'+(data.length!==1?'s':'');
+  tbody.innerHTML=data.map(r=>{
+    const nv=getNivel(r.pct);
+    const pctC=r.pct<60?'#A32D2D':r.pct<80?'#B8860B':r.pct<95?'#1255A1':r.pct<100?'#0F6E56':'#534AB7';
+    const idx=allData.indexOf(r);
+    return `<tr onclick="openPerfil(${idx})">
+      <td><strong>${esc(r.nombre)||'—'}</strong></td>
+      <td style="font-family:'Montserrat',sans-serif">${esc(r.cedula)||'—'}</td>
+      <td><span class="pill" style="background:${r.tipo==='Etapa 3'?'#E0F5F8':'#EEEDFE'};color:${r.tipo==='Etapa 3'?'#0E6674':'#3C3489'}">${r.tipo}</span></td>
+      <td>${esc(r.regional||r.zona)||'—'}</td>
+      <td><strong style="color:${pctC};font-size:13px;font-family:'Montserrat',sans-serif">${r.pct}%</strong></td>
+      <td><span class="pill" style="background:${nv.bg};color:${nv.color}">${nv.icon} ${nv.label}</span></td>
+      <td style="font-size:10px">${esc(r.cupo)||'—'}</td>
+      <td style="font-size:10px;color:#777">${esc(r.cliente||r.cadena)||'—'}</td>
+      <td style="font-size:10px;color:#aaa">${esc(r.fecha)||'—'}</td>
+      <td><button class="btn-ver" onclick="event.stopPropagation();openPerfil(${idx})">Ver perfil</button></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ════ PERFIL ════ */
+function openPerfil(idx){
+  const r=allData[idx];
+  if(!r) return;
+  const nv=getNivel(r.pct);
+  // Hero color
+  const heroColor=r.pct<60?'linear-gradient(135deg,#7a1c1c,#A32D2D)':r.pct<80?'linear-gradient(135deg,#7D5F00,#B8860B)':r.pct<95?'linear-gradient(135deg,#0a2d5a,#1255A1)':r.pct<100?'linear-gradient(135deg,#05342C,#0F6E56)':'linear-gradient(135deg,#26215C,#534AB7)';
+  document.getElementById('m-hero').style.background=heroColor;
+  document.getElementById('m-name').textContent=r.nombre||'Sin nombre';
+  document.getElementById('m-meta').textContent=`CC: ${r.cedula||'—'} · ${r.tipo} · ${r.regional||r.zona||'—'}`;
+  document.getElementById('m-score').textContent=r.pct+'%';
+  document.getElementById('m-score-sub').textContent=r.tipo==='Autoevaluación'?`Habilidades Blandas: ${r.pctB}%  ·  Habilidades Duras: ${r.pctD}%`:`Puntos Etapa 3: ${r.pts||'—'}/54  ·  Zona: ${r.zona||'—'}`;
+  document.getElementById('m-badge').innerHTML=`<span class="pill" style="background:${nv.bg};color:${nv.color};padding:4px 14px;font-size:12px">${nv.icon} ${nv.label}</span>`;
+
+  // Info grid
+  const info=[['Tipo evaluación',r.tipo],['Regional / Zona',r.regional||r.zona||'—'],['Cliente',r.cliente||r.cadena||'—'],['Cupo',r.cupo||'—'],['PDV / Cadena',r.pdv||r.cadena||'—'],['Fecha evaluación',r.fecha||'—']];
+  document.getElementById('m-info').innerHTML=info.map(([l,v])=>`<div class="info-item"><div class="info-lbl">${l}</div><div class="info-val">${esc(v)}</div></div>`).join('');
+
+  // Dimensiones
+  let dimsHTML='';
+  if(r.tipo==='Autoevaluación'){
+    dimsHTML+=dimBar('Promedio Habilidades Blandas',r.pctB,'#534AB7')
+             +dimBar('Promedio Habilidades Duras',r.pctD,'#0F6E56');
+  } else {
+    const DL=['Autonomía y Autogestión','Criterio y Decisiones','Confiabilidad','Adaptación y Aprendizaje','Actitud y Madurez','Proyección en el Rol'];
+    const DC=['#534AB7','#7C5CBF','#0E7490','#0F6E56','#854F0B','#A32D2D'];
+    const DM=[4,3,3,3,3,3];
+    const dims=r.dims&&r.dims.length?r.dims:[0,0,0,0,0,0];
+    DL.forEach((lbl,i)=>{
+      const pct=DM[i]>0?Math.round((dims[i]/DM[i])*100):0;
+      dimsHTML+=dimBar(lbl+` (${dims[i]}/${DM[i]} pts)`,pct,DC[i]);
+    });
+  }
+  document.getElementById('m-dims').innerHTML=dimsHTML;
+
+  // Plan
+  let planHTML='';
+  if(r.pct<60){
+    planHTML=`<div class="plan-box urgente-box">
+      <div class="plan-title">🚨 Intervención urgente — RRHH debe actuar de inmediato</div>
+      <div class="plan-body">
+        • <strong>Contactar en las próximas 48 horas</strong> para agendar reunión de seguimiento personalizado.<br>
+        • <strong>Diagnóstico individual:</strong> identificar causas raíz del bajo desempeño (personal, formativo u operativo).<br>
+        • <strong>Plan de mejora de 30 días</strong> con metas semanales medibles y revisión periódica.<br>
+        • <strong>Asignar tutor o mentor</strong> de mayor desempeño en la misma regional.<br>
+        • <strong>Re-evaluación</strong> al cierre del plan para medir avance y decidir continuidad.<br>
+        • <strong>Documentar en el expediente</strong> del colaborador para seguimiento formal de RRHH.
       </div>
     </div>`;
-
-  document.getElementById('alertas-list').innerHTML = `<div class="promotor-list">${html}</div>${rec}`;
-}
-
-/* ── TABLES ── */
-function renderAutoTable(){
-  const search = document.getElementById('search-auto').value.toLowerCase();
-  const reg    = document.getElementById('filter-regional').value;
-  const niv    = document.getElementById('filter-nivel').value;
-  const filtered = dataAuto.filter(r =>
-    (!search || r.nombre.toLowerCase().includes(search) || r.cedula.includes(search)) &&
-    (!reg || r.regional===reg) &&
-    (!niv || r.perfil===niv)
-  );
-  const tbody = document.getElementById('tbody-auto');
-  if(!filtered.length){ tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#999;padding:24px">Sin registros para los filtros seleccionados</td></tr>'; return; }
-  const nivelColors = {Destacado:['#E1F5EE','#0F6E56'],Competente:['#E6F1FB','#185FA5'],'En proceso':['#FAEEDA','#854F0B'],'En desarrollo':['#FCEBEB','#A32D2D']};
-  tbody.innerHTML = filtered.map(r => {
-    const nc = nivelColors[r.perfil]||['#f5f5f5','#666'];
-    return `<tr>
-      <td style="font-weight:600">${esc(r.nombre)}</td>
-      <td>${esc(r.cedula)}</td>
-      <td>${esc(r.regional)}</td>
-      <td style="font-size:11px">${esc(r.cadena||'—')}</td>
-      <td><span style="color:${r.pctB<66?'#A32D2D':'#0F6E56'};font-weight:700">${r.pctB}%</span></td>
-      <td><span style="color:${r.pctD<66?'#A32D2D':'#0F6E56'};font-weight:700">${r.pctD}%</span></td>
-      <td><strong>${r.pctTotal}%</strong></td>
-      <td><span style="background:${nc[0]};color:${nc[1]};padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;font-family:'Montserrat',sans-serif">${esc(r.perfil)}</span></td>
-      <td style="font-size:11px;color:#999">${esc(r.fechaEv)}</td>
-    </tr>`;
-  }).join('');
-}
-
-function renderEtapa3Table(){
-  const search = document.getElementById('search-etapa3').value.toLowerCase();
-  const zona   = document.getElementById('filter-zona').value;
-  const filtered = dataEtapa3.filter(r =>
-    (!search || r.nombre.toLowerCase().includes(search) || r.cedula.includes(search)) &&
-    (!zona || r.zona===zona)
-  );
-  const tbody = document.getElementById('tbody-etapa3');
-  if(!filtered.length){ tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#999;padding:24px">Sin registros para los filtros seleccionados</td></tr>'; return; }
-  const nivelColors = {'Nivel Alto':['#E1F5EE','#0F6E56'],'Nivel Medio':['#FAEEDA','#854F0B'],'Nivel Bajo':['#FCEBEB','#A32D2D']};
-  tbody.innerHTML = filtered.map(r => {
-    const nc = nivelColors[r.nivel]||['#f5f5f5','#666'];
-    return `<tr>
-      <td style="font-weight:600">${esc(r.nombre)}</td>
-      <td>${esc(r.cedula)}</td>
-      <td style="font-size:11px">${esc(r.cliente)}</td>
-      <td>${esc(r.zona)}</td>
-      <td>${esc(r.cupo)}</td>
-      <td style="font-weight:700">${r.pts}/54</td>
-      <td><strong>${r.pct}%</strong></td>
-      <td><span style="background:${nc[0]};color:${nc[1]};padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;font-family:'Montserrat',sans-serif">${esc(r.nivel)}</span></td>
-      <td style="font-size:11px;color:#999">${esc(r.fecha)}</td>
-    </tr>`;
-  }).join('');
-}
-
-/* ── EXPORT ── */
-function exportCSV(type){
-  const data = type==='auto' ? dataAuto : dataEtapa3;
-  if(!data.length){ alert('No hay datos para exportar.'); return; }
-  let csv, filename;
-  if(type==='auto'){
-    csv = 'Nombre,Cedula,Regional,Cadena,Blandas%,Duras%,Total%,Nivel,Fecha\n'
-      + data.map(r=>[r.nombre,r.cedula,r.regional,r.cadena,r.pctB,r.pctD,r.pctTotal,r.perfil,r.fechaEv].join(',')).join('\n');
-    filename = 'autoevaluaciones_semillero.csv';
+  } else if(r.pct<80){
+    planHTML=`<div class="plan-box ok-box">
+      <div class="plan-title">📈 Plan de fortalecimiento — Buen Desempeño</div>
+      <div class="plan-body">
+        • Seguimiento quincenal de desempeño con retroalimentación específica.<br>
+        • Reforzar las competencias o dimensiones con menor puntaje.<br>
+        • Establecer metas de mejora hacia Sobresaliente (>80%) en el próximo período.<br>
+        • Reconocer avances para sostener la motivación del colaborador.
+      </div>
+    </div>`;
+  } else if(r.pct<95){
+    planHTML=`<div class="plan-box star-box">
+      <div class="plan-title">⭐ Perfil Sobresaliente — Candidato a mayor responsabilidad</div>
+      <div class="plan-body">
+        • Candidato a asumir roles de mayor responsabilidad o mentorías.<br>
+        • Evaluar como potencial tutor para colaboradores con Bajo Desempeño.<br>
+        • Reconocimiento formal ante el equipo y la dirección.<br>
+        • Proyectar hacia Destacado con acompañamiento y retos específicos.
+      </div>
+    </div>`;
+  } else if(r.pct<100){
+    planHTML=`<div class="plan-box top-box">
+      <div class="plan-title">🏆 Perfil Destacado — Referente del equipo</div>
+      <div class="plan-body">
+        • Reconocimiento especial y visibilización en el equipo y con la dirección.<br>
+        • Candidato prioritario para nuevas responsabilidades o proyectos especiales.<br>
+        • Embajador del Modelo CONVERTIR — Compartir buenas prácticas con el equipo.<br>
+        • Documentar sus prácticas para replicar en otros colaboradores.
+      </div>
+    </div>`;
   } else {
-    csv = 'Nombre,Cedula,Cliente,Zona,Cupo,Puntos,Pct%,Nivel,Fecha\n'
-      + data.map(r=>[r.nombre,r.cedula,r.cliente,r.zona,r.cupo,r.pts,r.pct,r.nivel,r.fecha].join(',')).join('\n');
-    filename = 'etapa3_semillero.csv';
+    planHTML=`<div class="plan-box" style="background:#EEEDFE;border:1.5px solid rgba(83,74,183,.2)">
+      <div class="plan-title" style="color:#534AB7">🚀 Sobrecumplimiento — Alto impacto estratégico</div>
+      <div class="plan-body" style="color:#26215C">
+        • Reconocimiento institucional prioritario — Visibilizar a nivel directivo.<br>
+        • Proponer para un plan de carrera acelerado dentro de la organización.<br>
+        • Líder natural para la formación del equipo y nuevas iniciativas.<br>
+        • Documentar el caso como modelo de excelencia del Semillero de Talentos.
+      </div>
+    </div>`;
   }
-  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+  document.getElementById('m-plan').innerHTML=planHTML;
+  document.getElementById('modal-perfil').classList.add('open');
 }
 
-/* ── HELPERS ── */
-function esc(s){ return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function dimBar(label,pct,color){
+  const c=pct>=80?'#0F6E56':pct>=60?color:pct>=40?'#854F0B':'#A32D2D';
+  return `<div class="dim-row">
+    <div class="dim-lbl">${label}</div>
+    <div class="dim-bg"><div class="dim-fill" style="width:${Math.min(pct,100)}%;background:${c}"></div></div>
+    <div class="dim-pct" style="color:${c}">${pct}%</div>
+  </div>`;
+}
+function closeModal(){document.getElementById('modal-perfil').classList.remove('open');}
 
-/* ── INIT ── */
-loadAllData();
+/* EXPORT */
+function exportCSV(key){
+  const data=modData[key]||[];
+  if(!data.length){alert('No hay datos para exportar.');return;}
+  const hdr='Nombre,CC,Tipo,Regional,Pct%,Nivel,Cupo,Cliente,Fecha\n';
+  const rows=data.map(r=>[`"${r.nombre}"`,r.cedula,r.tipo,r.regional||r.zona,r.pct,getNivel(r.pct).label,r.cupo,`"${r.cliente||r.cadena||''}"`,r.fecha].join(',')).join('\n');
+  const blob=new Blob(['\uFEFF'+hdr+rows],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='rrhh_semillero_'+key+'_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+}
+function esc(s){return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 </script>
 </body>
 </html>
